@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Dynamique Vectorielle Haute Visibilité</title>
+    <style>
+        body { margin: 0; overflow: hidden; background-color: #050505; font-family: 'Segoe UI', monospace; }
+        
+        #legend {
+            position: absolute; top: 10px; left: 10px;
+            background: rgba(20, 20, 20, 0.9); color: #eee;
+            padding: 15px; border: 1px solid #555; border-radius: 8px;
+            pointer-events: none; user-select: none;
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+        }
+        
+        #controls {
+            position: absolute; top: 10px; right: 10px;
+            background: rgba(20, 20, 30, 0.95); color: #fff;
+            padding: 15px; border: 1px solid #4488ff; border-radius: 8px;
+            width: 240px;
+        }
+
+        .row { display: flex; align-items: center; margin-bottom: 6px; font-size: 13px; font-weight: bold; }
+        .box { width: 16px; height: 16px; margin-right: 10px; border: 1px solid #aaa; }
+        h3 { margin: 0 0 12px 0; font-size: 16px; text-decoration: underline; color: #fff; text-align: center;}
+        
+        input[type=range] { width: 100%; cursor: pointer; }
+        button { 
+            background: #4488ff; color: white; border: none; 
+            padding: 8px; margin-top: 8px; cursor: pointer; width: 100%; 
+            font-weight: bold; border-radius: 4px; font-size: 14px;
+        }
+        button:hover { background: #66aaff; }
+        button.pause { background: #ff4444; }
+    </style>
+</head>
+<body>
+    <div id="legend">
+        <h3>LÉGENDE DES FORCES</h3>
+        <div class="row"><div class="box" style="background:#ffff00;"></div>Force Centrifuge (F_ie)</div>
+        <div class="row"><div class="box" style="background:#ff00ff;"></div>Force de Coriolis (F_ic)</div>
+        <div class="row"><div class="box" style="background:#00ff00;"></div>Réaction (R) - Rouge uniquement</div>
+        <hr style="border-color:#444; opacity:0.5;">
+        <div class="row"><div class="box" style="background:#0088ff;"></div>Vitesse Relative (V_rel)</div>
+        <div style="font-size: 11px; color: #aaa; margin-top:5px;">
+            🔴 Rouge : Contrainte (Rail)<br>
+            🔵 Bleue : Libre (Inertie)
+        </div>
+    </div>
+
+    <div id="controls">
+        <h3>CONTRÔLES</h3>
+        <div style="margin-bottom:15px;">
+            <label>Vitesse : <span id="speedVal">1.0</span>x</label>
+            <input type="range" id="speedRange" min="0.0" max="1.5" step="0.1" value="0.5">
+        </div>
+        <button id="btnPause" class="pause">PAUSE / LECTURE</button>
+        <button id="btnReset">RESET</button>
+        <div style="font-size: 11px; color: #888; margin-top: 10px; text-align: center;">
+            *Astuce: Mettez en pause et observez<br>les vecteurs sur la bille bleue.
+        </div>
+    </div>
+
+    <script type="module">
+        import * as THREE from 'https://unpkg.com/three@0.126.0/build/three.module.js';
+        import { OrbitControls } from 'https://unpkg.com/three@0.126.0/examples/jsm/controls/OrbitControls.js';
+
+        // --- PARAMÈTRES VISUELS ---
+        const ARROW_SCALE = 0.5;  // Facteur de taille global des flèches
+        const ARROW_HEAD_W = 0.4; // Largeur tête
+        const ARROW_HEAD_L = 0.6; // Longueur tête
+        
+        // --- PARAMÈTRES PHYSIQUES ---
+        const OMEGA = 1.0;     
+        const R0 = 2.0;        
+        const MAX_TRAIL = 2000; 
+
+        let simTime = 0;
+        let isPaused = false;
+        let timeScale = 0.5; // Démarrage lent par défaut pour bien voir
+
+        // --- SCÈNE ---
+        const scene = new THREE.Scene();
+        scene.background = new THREE.Color(0x050505);
+        const camera = new THREE.PerspectiveCamera(40, window.innerWidth/window.innerHeight, 0.1, 100);
+        camera.position.set(0, 35, 10); // Vue plongeante
+        
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.body.appendChild(renderer.domElement);
+        new OrbitControls(camera, renderer.domElement);
+
+        // Lumières
+        scene.add(new THREE.AmbientLight(0xffffff, 0.6));
+        const dl = new THREE.DirectionalLight(0xffffff, 0.8);
+        dl.position.set(0,20,10); scene.add(dl);
+
+        // --- OBJETS ---
+        const pivot = new THREE.Group(); // Le Manège
+        scene.add(pivot);
+
+        // Plateau
+        const plate = new THREE.Mesh(new THREE.CircleGeometry(18, 64), new THREE.MeshPhongMaterial({ color: 0x222222, side: THREE.DoubleSide }));
+        plate.rotation.x = -Math.PI/2; pivot.add(plate);
+        const grid = new THREE.PolarGridHelper(18, 18, 10, 64, 0x444444, 0x333333);
+        grid.position.y = 0.02; pivot.add(grid);
+
+        // Guide Rouge
+        const rail = new THREE.Mesh(new THREE.BoxGeometry(36, 0.1, 0.2), new THREE.MeshBasicMaterial({ color: 0x550000, transparent:true, opacity:0.5 }));
+        rail.position.y = 0.05; pivot.add(rail);
+
+        // Billes
+        const geoBall = new THREE.SphereGeometry(0.5, 32, 32);
+        const bRed = new THREE.Mesh(geoBall, new THREE.MeshPhongMaterial({ color: 0xff0000, emissive: 0x330000 }));
+        const bBlue = new THREE.Mesh(geoBall, new THREE.MeshPhongMaterial({ color: 0x0088ff, emissive: 0x002244 }));
+        pivot.add(bRed); pivot.add(bBlue);
+
+        // --- VECTEURS (ArrowHelper) ---
+        function createFatArrow(color, parent) {
+            // On utilise ArrowHelper standard mais on va booster ses paramètres à l'update
+            const arr = new THREE.ArrowHelper(new THREE.Vector3(1,0,0), new THREE.Vector3(0,0,0), 1, color, ARROW_HEAD_L, ARROW_HEAD_W);
+            parent.add(arr);
+            return arr;
+        }
+
+        // Forces Rouge
+        const r_Fie = createFatArrow(0xffff00, pivot);
+        const r_Fic = createFatArrow(0xff00ff, pivot);
+        const r_R   = createFatArrow(0x00ff00, pivot);
+        
+        // Forces Bleu
+        const b_Fie = createFatArrow(0xffff00, pivot);
+        const b_Fic = createFatArrow(0xff00ff, pivot);
+        const b_Vel = createFatArrow(0x0088ff, pivot); // Vitesse relative
+
+        // --- TRACES ---
+        function createTrail(color, parent) {
+            const geo = new THREE.BufferGeometry();
+            const pos = new Float32Array(MAX_TRAIL * 3);
+            geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+            const line = new THREE.Line(geo, new THREE.LineBasicMaterial({ color: color, linewidth: 2 }));
+            line.frustumCulled = false; parent.add(line);
+            return { mesh: line, pos: pos, count: 0 };
+        }
+        const trailRelRed = createTrail(0xff4444, pivot);
+        const trailRelBlue = createTrail(0x4488ff, pivot);
+        const trailAbsBlue = createTrail(0xaaaaaa, scene); // Trajectoire blanche absolue
+
+        // Vitesse initiale Bleue (Absolue)
+        // Pour démarrer "immobile" par rapport au tube au rayon R0, 
+        // elle doit avoir la vitesse tangentielle du plateau à cet endroit.
+        // V_abs = Omega * R0 (tangentielle)
+        const blueV0_tan = -R0 * OMEGA; // Sens horaire (Z-) car rotation plateau Anti-Horaire (Y+)
+
+        // --- MOTEUR PHYSIQUE ---
+        function updatePhysics(dt) {
+            simTime += dt;
+            const angle = OMEGA * simTime;
+            pivot.rotation.y = angle;
+
+            // ==============================
+            // 1. BILLE ROUGE (Analytique)
+            // ==============================
+            const rRed = R0 * Math.cosh(OMEGA * simTime);
+            const vrRed = R0 * OMEGA * Math.sinh(OMEGA * simTime);
+            bRed.position.set(rRed, 0.5, 0);
+
+            // Vecteurs Rouge (Simple car 1D)
+            updateArrow(r_Fie, bRed.position, new THREE.Vector3(1,0,0), rRed * OMEGA * OMEGA); // m w² r
+            updateArrow(r_Fic, bRed.position, new THREE.Vector3(0,0,1), 2 * OMEGA * vrRed);    // 2 m w v
+            updateArrow(r_R,   bRed.position, new THREE.Vector3(0,0,-1), 2 * OMEGA * vrRed);   // Opposé
+
+            // ==============================
+            // 2. BILLE BLEUE (Vectorielle)
+            // ==============================
+            // Position Absolue : Rectiligne Uniforme
+            // Pos(t) = Init + V * t
+            const absX = R0; 
+            const absZ = blueV0_tan * simTime; // Avance sur l'axe Z négatif (tangente)
+            const absPos = new THREE.Vector3(absX, 0.5, absZ);
+            
+            // Conversion en Position Locale (dans le repère tournant)
+            // On applique la rotation inverse (-angle) autour de Y
+            const relPos = absPos.clone().applyAxisAngle(new THREE.Vector3(0,1,0), -angle);
+            bBlue.position.copy(relPos);
+
+            // --- CALCULS VECTORIELS ---
+            
+            // A. Vecteur Rotation (Omega)
+            const omegaVec = new THREE.Vector3(0, OMEGA, 0);
+
+            // B. Vitesse Absolue exprimée dans le repère local
+            // La vitesse absolue est constante (0, 0, blueV0_tan)
+            // Mais vue du manège, ce vecteur tourne !
+            const vAbsVec = new THREE.Vector3(0, 0, blueV0_tan).applyAxisAngle(new THREE.Vector3(0,1,0), -angle);
+
+            // C. Vitesse d'Entraînement (V_e = Omega ^ OM) au point M actuel
+            const vEntVec = new THREE.Vector3().crossVectors(omegaVec, relPos);
+
+            // D. Vitesse Relative (V_r = V_a - V_e)
+            const vRelVec = new THREE.Vector3().subVectors(vAbsVec, vEntVec);
+
+            // --- FORCES FICTIVES BLEUE ---
+
+            // 1. Force Centrifuge (F_ie = m Omega^2 r)
+            // Direction : Radiale sortante (OM, sans Y)
+            const dirCentri = new THREE.Vector3(relPos.x, 0, relPos.z).normalize();
+            const magCentri = relPos.length() * OMEGA * OMEGA;
+            updateArrow(b_Fie, bBlue.position, dirCentri, magCentri);
+
+            // 2. Force de Coriolis (F_ic = -2 m Omega ^ V_rel)
+            // Calcul du produit vectoriel (Omega ^ V_rel)
+            const crossProd = new THREE.Vector3().crossVectors(omegaVec, vRelVec);
+            // On multiplie par -2
+            const coriolisVec = crossProd.multiplyScalar(-2.0);
+            updateArrow(b_Fic, bBlue.position, coriolisVec.clone().normalize(), coriolisVec.length());
+
+            // 3. Visualisation Vitesse Relative
+            updateArrow(b_Vel, bBlue.position, vRelVec.clone().normalize(), vRelVec.length());
+
+            // --- TRACES ---
+            addPointToTrail(trailRelRed, rRed, 0, 0); // Rouge reste sur X
+            addPointToTrail(trailRelBlue, relPos.x, 0, relPos.z);
+            addPointToTrail(trailAbsBlue, absX, 0, absZ);
+
+            if (rRed > 25) resetSim();
+        }
+
+        function updateArrow(arrow, origin, dir, mag) {
+            if (mag < 0.01) { arrow.visible = false; return; }
+            arrow.visible = true;
+            arrow.position.copy(origin);
+            arrow.setDirection(dir);
+            arrow.setLength(mag * ARROW_SCALE, ARROW_HEAD_L, ARROW_HEAD_W);
+        }
+
+        function addPointToTrail(trail, x, y, z) {
+            if (trail.count < MAX_TRAIL) {
+                const i = trail.count * 3;
+                trail.pos[i]=x; trail.pos[i+1]=y+0.05; trail.pos[i+2]=z;
+                trail.count++;
+                trail.mesh.geometry.setDrawRange(0, trail.count);
+                trail.mesh.geometry.attributes.position.needsUpdate = true;
+            }
+        }
+
+        function resetSim() {
+            simTime = 0;
+            [trailRelRed, trailRelBlue, trailAbsBlue].forEach(t => { t.count=0; t.mesh.geometry.setDrawRange(0,0); });
+        }
+
+        // --- BOUCLE ---
+        const clock = new THREE.Clock();
+        function animate() {
+            requestAnimationFrame(animate);
+            const dt = clock.getDelta();
+            if(!isPaused) updatePhysics(dt * timeScale);
+            renderer.render(scene, camera);
+        }
+        animate();
+
+        // --- UI EVENTS ---
+        document.getElementById('speedRange').addEventListener('input', e => {
+            timeScale = parseFloat(e.target.value);
+            document.getElementById('speedVal').innerText = timeScale.toFixed(1);
+        });
+        document.getElementById('btnPause').addEventListener('click', function() {
+            isPaused = !isPaused;
+            this.innerText = isPaused ? "LECTURE" : "PAUSE";
+            this.style.background = isPaused ? "#4488ff" : "#ff4444";
+        });
+        document.getElementById('btnReset').addEventListener('click', resetSim);
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth/window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+    </script>
+</body>
+</html>

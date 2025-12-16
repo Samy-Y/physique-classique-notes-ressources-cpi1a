@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Labo Interactif : Tour de la Nappe</title>
+    <style>
+        :root {
+            --bg-color: #f0f2f5;
+            --panel-bg: #ffffff;
+            --text-color: #333;
+            --accent-color: #2563eb;
+        }
+
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background-color: var(--bg-color);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            color: var(--text-color);
+        }
+
+        h2 { margin-bottom: 10px; }
+
+        /* Zone de simulation (Canvas) */
+        .canvas-container {
+            position: relative;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+            border-radius: 8px;
+            overflow: hidden;
+            background-color: #fff;
+            margin-bottom: 20px;
+            border: 2px solid #ccc;
+        }
+
+        canvas {
+            display: block;
+            background-color: #f9f9f9;
+        }
+
+        /* Panneau de contrôle */
+        .controls {
+            background-color: var(--panel-bg);
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            width: 800px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        label {
+            font-weight: bold;
+            font-size: 0.9rem;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        /* Boutons de lecture */
+        .playback-controls {
+            grid-column: span 2;
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            border-top: 1px solid #eee;
+            padding-top: 15px;
+        }
+
+        button {
+            padding: 10px 20px;
+            font-size: 1rem;
+            cursor: pointer;
+            border: none;
+            border-radius: 5px;
+            background-color: #e2e8f0;
+            color: #1e293b;
+            transition: all 0.2s;
+            font-weight: bold;
+        }
+
+        button:hover { background-color: #cbd5e1; }
+        button:active { transform: scale(0.98); }
+
+        button.primary {
+            background-color: var(--accent-color);
+            color: white;
+        }
+        button.primary:hover { background-color: #1d4ed8; }
+
+        /* Indicateurs de données */
+        .data-panel {
+            grid-column: span 2;
+            background: #1e293b;
+            color: #fff;
+            padding: 10px;
+            border-radius: 5px;
+            font-family: monospace;
+            display: flex;
+            justify-content: space-around;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            cursor: pointer;
+        }
+
+    </style>
+</head>
+<body>
+
+    <h2>Simulation Dynamique : Inertie & Frottements</h2>
+    
+    <div class="canvas-container">
+        <canvas id="simCanvas" width="800" height="350"></canvas>
+    </div>
+
+    <div class="controls">
+        <div class="control-group">
+            <label>Coefficient de frottement (&mu;) : <span id="muVal">0.20</span></label>
+            <input type="range" id="muSlider" min="0.0" max="0.9" step="0.05" value="0.20">
+            <small>Faible = Glisse bien | Élevé = Accroche</small>
+        </div>
+
+        <div class="control-group">
+            <label>Vitesse de lecture : <span id="speedVal">1.0x</span></label>
+            <input type="range" id="speedSlider" min="0.1" max="2.0" step="0.1" value="1.0">
+            <small>Pour observer le détail du mouvement</small>
+        </div>
+
+        <div class="data-panel">
+            <span>Force Frottement (f) = <span id="frictionForce">0</span> N</span>
+            <span>Accél. Objet (a) = <span id="accelObj">0</span> m/s²</span>
+        </div>
+
+        <div class="playback-controls">
+            <button id="btnReset">⏮ Réinitialiser</button>
+            <button id="btnStep">⏯ Pas à pas</button>
+            <button id="btnPlayPause" class="primary">▶ Lecture</button>
+        </div>
+    </div>
+
+    <script>
+        // --- Configuration ---
+        const canvas = document.getElementById('simCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        // Éléments UI
+        const muSlider = document.getElementById('muSlider');
+        const speedSlider = document.getElementById('speedSlider');
+        const muDisplay = document.getElementById('muVal');
+        const speedDisplay = document.getElementById('speedVal');
+        const frictionDisplay = document.getElementById('frictionForce');
+        const accelDisplay = document.getElementById('accelObj');
+        const btnPlayPause = document.getElementById('btnPlayPause');
+        const btnReset = document.getElementById('btnReset');
+        const btnStep = document.getElementById('btnStep');
+
+        // --- État de la simulation ---
+        let state = {
+            running: false,
+            t: 0,           // Temps écoulé
+            mu: 0.2,        // Coeff frottement
+            g: 9.81,        // Gravité
+            mass: 1,        // Masse objet (kg) - arbitraire pour visuel
+            pixelsPerMeter: 200, 
+            simSpeed: 1.0,  // Multiplicateur de temps
+            
+            // Positions initiales
+            clothX: 50,
+            objRelX: 150,   // Position de l'objet RELATIVE à la nappe au départ
+            
+            // Cinématique
+            clothAccel: 15, // Accélération brutale de la nappe (m/s²)
+            objPos: 200,    // Position absolue de l'objet (pixels)
+            clothPos: 50,   // Position absolue de la nappe (pixels)
+            objVel: 0       // Vitesse objet
+        };
+
+        // --- Moteur Physique ---
+        function updatePhysics(dt) {
+            // dt est en secondes
+            
+            // 1. Mouvement de la Nappe (Imposé)
+            // x = 1/2 * a * t^2
+            // On convertit en pixels pour l'affichage
+            let movementMeters = 0.5 * state.clothAccel * (state.t * state.t);
+            state.clothPos = 50 + (movementMeters * state.pixelsPerMeter);
+
+            // 2. Mouvement de l'Objet (Réponse)
+            // L'objet subit une force de frottement f = mu * m * g
+            // Donc accélération a_obj = mu * g
+            // SAUF si a_obj > a_nappe (ce qui est impossible ici car on tire fort), 
+            // ou si la nappe n'est plus sous l'objet.
+            
+            // Vérifier si l'objet est encore sur la nappe
+            // La nappe fait 400px de large. 
+            let clothEnd = state.clothPos + 400;
+            let objectCenter = state.objPos + 40; // Objet fait 80px de large
+            
+            let isOnCloth = (objectCenter > state.clothPos && objectCenter < clothEnd);
+
+            let objAccel = 0;
+
+            if (isOnCloth) {
+                // Accélération due au frottement cinétique
+                objAccel = state.mu * state.g;
+            } else {
+                // L'objet est sur la table. Frottement qui freine (décélération)
+                // On simplifie : ça freine un peu
+                if (state.objVel > 0) objAccel = -2; 
+                else { objAccel = 0; state.objVel = 0; }
+            }
+
+            // Mise à jour vitesse et position (Euler intégration simple)
+            state.objVel += objAccel * dt;
+            // Empêcher la vitesse négative si arrêt
+            if(state.objVel < 0) state.objVel = 0;
+
+            state.objPos += (state.objVel * dt) * state.pixelsPerMeter;
+
+            // Mise à jour UI Données
+            accelDisplay.textContent = isOnCloth ? objAccel.toFixed(2) : "0.00";
+            // Force f = m * a (on prend masse = 1kg pour simplifier l'affichage)
+            frictionDisplay.textContent = isOnCloth ? (objAccel * 1).toFixed(2) : "0.00";
+        }
+
+        // --- Rendu Graphique ---
+        function draw() {
+            // 1. Effacer
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // 2. Dessiner la Table (Fixe)
+            ctx.fillStyle = "#5D4037"; // Marron foncé bois
+            ctx.fillRect(50, 250, 700, 20); // Plateau
+            ctx.fillRect(70, 270, 20, 60);  // Pied G
+            ctx.fillRect(710, 270, 20, 60); // Pied D
+
+            // 3. Dessiner la Nappe (Mobile)
+            ctx.fillStyle = "#D32F2F"; // Rouge vif
+            // La nappe est dessinée à state.clothPos
+            ctx.fillRect(state.clothPos, 246, 400, 4); 
+
+            // 4. Dessiner l'Objet (Mobile inertiel)
+            ctx.fillStyle = "#1565C0"; // Bleu roi contrasté
+            ctx.strokeStyle = "#000";
+            ctx.lineWidth = 2;
+            // L'objet est à state.objPos, on le dessine posé sur la nappe ou la table
+            // Y base = 250 (table). Objet haut 80. Donc Y = 170.
+            // Si sur nappe, on remonte de 4px -> 166.
+            
+            // Détection collision visuelle simple
+            let clothEnd = state.clothPos + 400;
+            let objectCenter = state.objPos + 40;
+            let onCloth = (objectCenter > state.clothPos && objectCenter < clothEnd);
+            
+            let objY = onCloth ? 166 : 170;
+
+            ctx.fillRect(state.objPos, objY, 80, 80);
+            ctx.strokeRect(state.objPos, objY, 80, 80);
+
+            // Texte sur l'objet
+            ctx.fillStyle = "white";
+            ctx.font = "bold 20px Arial";
+            ctx.fillText("M", state.objPos + 30, objY + 45);
+
+            // 5. Dessiner les Vecteurs (Forces)
+            if (state.running || state.t > 0) {
+                drawVectors(state.objPos + 40, objY + 40, onCloth);
+            }
+        }
+
+        function drawVectors(cx, cy, active) {
+            // cx, cy = centre de l'objet
+            
+            // Poids (mg) - Vert foncé
+            drawArrow(ctx, cx, cy, cx, cy + 60, "#2E7D32", "P");
+            
+            // Réaction (Rn) - Vert foncé
+            drawArrow(ctx, cx, cy, cx, cy - 60, "#2E7D32", "Rn");
+
+            // Frottement (f) - Orange vif
+            // N'existe que si actif (sur la nappe et en mouvement)
+            if (active) {
+                // La longueur de la flèche dépend de mu
+                let arrowLen = state.mu * 100; 
+                drawArrow(ctx, cx, cy + 40, cx + arrowLen, cy + 40, "#FF6D00", "f = μRn");
+            }
+        }
+
+        function drawArrow(context, fromx, fromy, tox, toy, color, label) {
+            const headlen = 10; 
+            const angle = Math.atan2(toy - fromy, tox - fromx);
+            context.beginPath();
+            context.moveTo(fromx, fromy);
+            context.lineTo(tox, toy);
+            context.lineTo(tox - headlen * Math.cos(angle - Math.PI / 6), toy - headlen * Math.sin(angle - Math.PI / 6));
+            context.moveTo(tox, toy);
+            context.lineTo(tox - headlen * Math.cos(angle + Math.PI / 6), toy - headlen * Math.sin(angle + Math.PI / 6));
+            context.strokeStyle = color;
+            context.lineWidth = 3;
+            context.stroke();
+
+            // Label
+            context.fillStyle = color;
+            context.font = "bold 14px Arial";
+            context.fillText(label, tox + 5, toy - 5);
+        }
+
+        // --- Boucle d'Animation ---
+        let lastTime = 0;
+        function loop(timestamp) {
+            if (!lastTime) lastTime = timestamp;
+            let deltaTime = (timestamp - lastTime) / 1000; // en secondes
+            lastTime = timestamp;
+
+            if (state.running) {
+                // On applique le multiplicateur de vitesse
+                let simDt = deltaTime * state.simSpeed;
+                state.t += simDt;
+                updatePhysics(simDt);
+                
+                // Arrêt auto si la nappe est partie loin
+                if (state.clothPos > 800 && state.objVel <= 0.1) {
+                    state.running = false;
+                    btnPlayPause.textContent = "↺ Rejouer";
+                }
+            }
+
+            draw();
+            requestAnimationFrame(loop);
+        }
+
+        // --- Gestionnaires d'événements ---
+
+        // Reset
+        function reset() {
+            state.running = false;
+            state.t = 0;
+            state.objPos = 200;
+            state.clothPos = 50;
+            state.objVel = 0;
+            btnPlayPause.textContent = "▶ Lecture";
+            draw();
+        }
+
+        // Play / Pause
+        btnPlayPause.addEventListener('click', () => {
+            if (state.clothPos > 800) { reset(); } // Auto reset si fini
+            
+            state.running = !state.running;
+            btnPlayPause.textContent = state.running ? "⏸ Pause" : "▶ Lecture";
+        });
+
+        // Reset Bouton
+        btnReset.addEventListener('click', reset);
+
+        // Step by Step
+        btnStep.addEventListener('click', () => {
+            state.running = false;
+            btnPlayPause.textContent = "▶ Lecture";
+            // Avance de 0.05 seconde simulée
+            let dt = 0.05;
+            state.t += dt;
+            updatePhysics(dt);
+            draw();
+        });
+
+        // Sliders
+        muSlider.addEventListener('input', (e) => {
+            state.mu = parseFloat(e.target.value);
+            muDisplay.textContent = state.mu.toFixed(2);
+            draw(); // Redessiner pour mettre à jour la longueur de la flèche f
+        });
+
+        speedSlider.addEventListener('input', (e) => {
+            state.simSpeed = parseFloat(e.target.value);
+            speedDisplay.textContent = state.simSpeed.toFixed(1) + "x";
+        });
+
+        // Démarrage initial
+        reset();
+        requestAnimationFrame(loop);
+
+    </script>
+</body>
+</html>

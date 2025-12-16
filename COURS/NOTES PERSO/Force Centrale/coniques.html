@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Coniques Ultimate : Interaction Complète 2D/3D</title>
+    
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" integrity="sha384-n8MVd4RsNIU0tAv4ct0nTaAbDJwPJzDEaqSD1odI+WdtXRGWt2kTvGFasHpSy3SV" crossorigin="anonymous">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js" integrity="sha384-XjKyOOlGwcjNTAIQHIpgOno0Hl1YQqzUOEleOLALmuqehneUG+vnGctmUb0ZY0l8" crossorigin="anonymous"></script>
+    
+    <script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
+    <script type="importmap">
+      {
+        "imports": {
+          "three": "https://unpkg.com/three@0.158.0/build/three.module.js",
+          "three/addons/": "https://unpkg.com/three@0.158.0/examples/jsm/"
+        }
+      }
+    </script>
+
+    <style>
+        :root { --primary: #2c3e50; --accent: #3498db; --bg: #f0f2f5; --text: #333; --success: #27ae60; --danger: #e74c3c; }
+        body { margin: 0; font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background: var(--bg); color: var(--text); display: flex; height: 100vh; overflow: hidden; }
+        
+        /* Sidebar Styles */
+        #sidebar { width: 360px; background: white; padding: 25px; box-shadow: 5px 0 25px rgba(0,0,0,0.05); overflow-y: auto; z-index: 10; display: flex; flex-direction: column; gap: 20px;}
+        h1 { font-size: 1.5rem; color: var(--primary); margin: 0 0 10px 0; display: flex; align-items: center; gap: 10px; }
+        .control-section { background: #f8f9fa; padding: 15px; border-radius: 12px; border: 1px solid #e9ecef; }
+        .control-header { font-weight: 700; color: var(--primary); margin-bottom: 15px; display: block; font-size: 1rem;}
+        label { display: block; font-weight: 600; margin-bottom: 8px; font-size: 0.85rem; color: #555; }
+        input[type=range] { width: 100%; margin-bottom: 5px; cursor: pointer; accent-color: var(--accent); }
+        select { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #ddd; font-size: 0.95rem; background: white; cursor: pointer; transition: border-color 0.3s;}
+        select:hover { border-color: var(--accent); }
+
+        /* Visual cue when sliders are driven by 3D */
+        .driven-by-3d input[type=range] { opacity: 0.7; accent-color: #95a5a6; }
+        .driven-by-3d label { color: #95a5a6; }
+
+        
+        /* Math Display Area */
+        #math-output { background: #fff; border: 1px solid #e0e0e0; border-radius: 12px; padding: 20px; margin-top: auto; font-size: 0.95rem; box-shadow: 0 -5px 20px rgba(0,0,0,0.03);}
+        .math-row { margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid #eee; }
+        .math-row:last-child { margin-bottom: 0; padding-bottom: 0; border-bottom: none; }
+        .math-label { font-weight: bold; color: var(--accent); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px;}
+        .math-content { min-height: 30px; display: flex; align-items: center; overflow-x: auto; overflow-y: hidden;}
+
+        /* Viewport Styles */
+        #viewport { flex-grow: 1; position: relative; background: #fff; }
+        #canvas-2d { display: block; width: 100%; height: 100%; /*position: absolute; top:0; left:0;*/ }
+        #container-3d { width: 100%; height: 100%; position: absolute; top:0; left:0; visibility: hidden; pointer-events: none; /* Hidden by default */ }
+        
+        /* Toggle Switch */
+        .view-toggle-container { position: absolute; top: 25px; right: 25px; background: rgba(255,255,255,0.9); backdrop-filter: blur(5px); padding: 5px; border-radius: 30px; box-shadow: 0 8px 20px rgba(0,0,0,0.1); display: flex; gap: 5px; z-index: 100; border: 1px solid rgba(0,0,0,0.05);}
+        .view-btn { border: none; background: none; padding: 10px 20px; border-radius: 25px; cursor: pointer; font-weight: 700; font-size: 0.9rem; transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); color: #7f8c8d;}
+        .view-btn.active { background: var(--accent); color: white; box-shadow: 0 4px 15px rgba(52, 152, 219, 0.4);}
+        .view-btn:hover:not(.active) { background: rgba(0,0,0,0.05); color: var(--primary); }
+
+        
+        /* Utility */
+        .value-tag { float: right; color: var(--accent); font-family: 'Fira Code', monospace; font-weight: 700; background: rgba(52, 152, 219, 0.1); padding: 2px 6px; border-radius: 4px; font-size: 0.8rem;}
+        .hidden { display: none !important; }
+    </style>
+</head>
+<body>
+
+<div id="sidebar">
+    <h1>📐 Coniques Ultimate</h1>
+
+    <div>
+        <label style="font-size: 0.9rem;">Type de Conique (Résultat)</label>
+        <select id="conicType">
+            <option value="ellipse">Ellipse (Fermée)</option>
+            <option value="hyperbola">Hyperbole (Ouverte)</option>
+            <option value="parabola">Parabole (Limite)</option>
+        </select>
+    </div>
+
+    <div class="control-section" id="controls-2d-container">
+        <span class="control-header">Paramètres 2D (Forme)</span>
+        <div id="ctrl-a-wrapper">
+            <label>Demi-grand axe ($a$) <span id="val-a" class="value-tag">3.00</span></label>
+            <input type="range" id="input-a" min="0.5" max="15" step="0.1" value="3">
+        </div>
+        <div id="ctrl-b-wrapper">
+            <label>Demi-petit axe ($b$) <span id="val-b" class="value-tag">2.00</span></label>
+            <input type="range" id="input-b" min="0.5" max="15" step="0.1" value="2">
+        </div>
+        <div id="ctrl-p-wrapper" class="hidden">
+            <label>Paramètre ($p$) <span id="val-p" class="value-tag">2.00</span></label>
+            <input type="range" id="input-p" min="0.5" max="8" step="0.1" value="2">
+        </div>
+    </div>
+
+    <div class="control-section" style="border-color: var(--danger); background: #fff5f5;">
+        <span class="control-header" style="color: var(--danger);">Paramètres 3D (Coupe)</span>
+        <p style="font-size: 0.8rem; color: #777; margin-top: -10px; margin-bottom: 15px;">Modifiez ces valeurs pour piloter automatiquement la forme 2D.</p>
+        
+        <label>Angle du Plan ($\beta$) <span id="val-angle" class="value-tag" style="color: var(--danger); background: rgba(231, 76, 60, 0.1);">0°</span></label>
+        <input type="range" id="input-angle" min="0" max="89" step="0.5" value="0" style="accent-color: var(--danger);">
+        <div style="display: flex; justify-content: space-between; font-size: 0.7rem; color: #aaa; margin-top: -5px;">
+            <span>0° (Horiz.)</span><span>45° (Para.)</span><span>90° (Vert.)</span>
+        </div>
+        
+        <br>
+        <label>Décalage Z (Hauteur $h$) <span id="val-offset" class="value-tag" style="color: var(--danger); background: rgba(231, 76, 60, 0.1);">0.00</span></label>
+        <input type="range" id="input-offset" min="-6" max="6" step="0.1" value="0" style="accent-color: var(--danger);">
+    </div>
+
+    <div id="math-output">
+        <div class="math-row">
+            <div class="math-label">Équation Cartésienne</div>
+            <div id="eq-cartesian" class="math-content"></div>
+        </div>
+        <div class="math-row">
+            <div class="math-label">Paramètres Clés</div>
+            <div id="eq-params" class="math-content"></div>
+        </div>
+        <div class="math-row">
+            <div class="math-label">Équation Polaire (Foyer)</div>
+            <div id="eq-polar" class="math-content"></div>
+        </div>
+    </div>
+</div>
+
+<div id="viewport">
+    <div class="view-toggle-container">
+        <button class="view-btn active" onclick="switchMode('2D')">Vue 2D (Graphe)</button>
+        <button class="view-btn" onclick="switchMode('3D')">Vue 3D (Cône)</button>
+    </div>
+    
+    <canvas id="canvas-2d"></canvas>
+    <div id="container-3d"></div>
+</div>
+
+<script type="module">
+    import * as THREE from 'three';
+    import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+    // GLOBAL STATE
+    const state = {
+        mode: '2D', // '2D' or '3D' view priority
+        type: 'ellipse',
+        a: 3,
+        b: 2,
+        p: 2,
+        cutAngle: 0, // Degrees
+        cutOffset: 0,
+        isDrivenBy3D: false // Flag to know if 2D params are set by 3D sliders
+    };
+
+    const CONE_SEMI_ANGLE = 45; // Degrees. Fixed for the 3D model structure.
+
+    // --- DOM ELEMENTS ---
+    const ui = {
+        canvas2D: document.getElementById('canvas-2d'),
+        container3D: document.getElementById('container-3d'),
+        inputType: document.getElementById('conicType'),
+        
+        // 2D Inputs
+        inputA: document.getElementById('input-a'),
+        inputB: document.getElementById('input-b'),
+        inputP: document.getElementById('input-p'),
+        ctrl2DContainer: document.getElementById('controls-2d-container'),
+        ctrlA: document.getElementById('ctrl-a-wrapper'),
+        ctrlB: document.getElementById('ctrl-b-wrapper'),
+        ctrlP: document.getElementById('ctrl-p-wrapper'),
+        
+        // 3D Inputs
+        inputAngle: document.getElementById('input-angle'),
+        inputOffset: document.getElementById('input-offset'),
+        
+        // Value labels
+        valA: document.getElementById('val-a'),
+        valB: document.getElementById('val-b'),
+        valP: document.getElementById('val-p'),
+        valAngle: document.getElementById('val-angle'),
+        valOffset: document.getElementById('val-offset'),
+        
+        // Math outputs
+        eqCartesian: document.getElementById('eq-cartesian'),
+        eqParams: document.getElementById('eq-params'),
+        eqPolar: document.getElementById('eq-polar'),
+        btns: document.querySelectorAll('.view-btn')
+    };
+
+    // --- 2D ENGINE (CANVAS) ---
+    const ctx = ui.canvas2D.getContext('2d');
+    let width, height, scale = 40;
+    let centerX, centerY;
+
+    function resize2D() {
+        width = ui.canvas2D.clientWidth;
+        height = ui.canvas2D.clientHeight;
+        ui.canvas2D.width = width;
+        ui.canvas2D.height = height;
+        centerX = width / 2;
+        centerY = height / 2;
+        if(state.mode === '2D') render2D();
+    }
+
+    function toScreen(x, y) {
+        return { x: centerX + x*scale, y: centerY - y*scale };
+    }
+
+    function render2D() {
+        ctx.clearRect(0,0,width,height);
+        
+        // Grid
+        ctx.strokeStyle = '#f0f0f0'; ctx.lineWidth = 1;
+        ctx.beginPath();
+        const gridSize = scale;
+        const offsetX = centerX % gridSize;
+        const offsetY = centerY % gridSize;
+        for(let i=offsetX; i<width; i+=gridSize) { ctx.moveTo(i,0); ctx.lineTo(i,height); }
+        for(let i=offsetY; i<height; i+=gridSize) { ctx.moveTo(0,i); ctx.lineTo(width,i); }
+        ctx.stroke();
+
+        // Axes
+        ctx.strokeStyle = '#e0e0e0'; ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(centerX, 0); ctx.lineTo(centerX, height);
+        ctx.moveTo(0, centerY); ctx.lineTo(width, centerY);
+        ctx.stroke();
+        
+        // Axis labels
+        ctx.fillStyle = '#999'; font: '12px sans-serif';
+        ctx.fillText('x', width-15, centerY + 15);
+        ctx.fillText('y', centerX + 10, 15);
+
+        ctx.lineWidth = 3;
+        ctx.lineCap = 'round';
+
+        if (state.type === 'ellipse') {
+            ctx.strokeStyle = '#3498db';
+            ctx.beginPath();
+            const {a, b} = state;
+            // Ensure valid positive radii for canvas ellipse
+            const safeA = Math.max(0.01, a);
+            const safeB = Math.max(0.01, b);
+            ctx.ellipse(centerX, centerY, safeA*scale, safeB*scale, 0, 0, Math.PI*2);
+            ctx.stroke();
+            
+            // Foci
+            if(safeA > 0 && safeB > 0) {
+                const c = Math.sqrt(Math.abs(safeA*safeA - safeB*safeB));
+                drawFocus(c, 0); drawFocus(-c, 0);
+            }
+        } 
+        else if (state.type === 'hyperbola') {
+            ctx.strokeStyle = '#e74c3c';
+            const {a, b} = state;
+            const c = Math.sqrt(a*a + b*b);
+            
+            const drawBranch = (sign) => {
+                 ctx.beginPath();
+                 // Draw a bit further than screen boundaries
+                 const limitT = Math.acosh((width/(2*scale))/Math.max(0.1, a)) + 1; 
+                 for(let t=-limitT; t<=limitT; t+=0.05) {
+                    let x = sign * a * Math.cosh(t); let y = b * Math.sinh(t);
+                    let p = toScreen(x,y); t===-limitT ? ctx.moveTo(p.x, p.y) : ctx.lineTo(p.x, p.y);
+                }
+                ctx.stroke();
+            }
+            drawBranch(1); drawBranch(-1);
+            
+            // Asymptotes
+            ctx.strokeStyle = '#bdc3c7'; ctx.setLineDash([5,5]); ctx.lineWidth = 1.5;
+            ctx.beginPath();
+            const slope = b/Math.max(0.01, a);
+            let p1 = toScreen(-20, -20*slope); let p2 = toScreen(20, 20*slope);
+            ctx.moveTo(p1.x, p1.y); ctx.lineTo(p2.x, p2.y);
+            p1 = toScreen(-20, 20*slope); p2 = toScreen(20, -20*slope);
+            ctx.moveTo(p1.x, p1.y); ctx.lineTo(p2.x, p2.y);
+            ctx.stroke(); ctx.setLineDash([]);
+
+            drawFocus(c, 0); drawFocus(-c, 0);
+        }
+        else if (state.type === 'parabola') {
+            ctx.strokeStyle = '#27ae60';
+            const {p} = state;
+            ctx.beginPath();
+            // Determine draw limits based on screen size to avoid drawing excessively
+            const maxY = (height/2)/scale + 2;
+            for(let y=-maxY; y<=maxY; y+=0.1) {
+                let x = (y*y)/(2*Math.max(0.01, p));
+                let pt = toScreen(x, y);
+                y===-maxY ? ctx.moveTo(pt.x, pt.y) : ctx.lineTo(pt.x, pt.y);
+            }
+            ctx.stroke();
+            drawFocus(p/2, 0);
+            
+            // Directrix
+            ctx.strokeStyle = '#f39c12'; ctx.setLineDash([5,5]); ctx.lineWidth = 1.5;
+            ctx.beginPath();
+            let d = toScreen(-p/2, 0);
+            ctx.moveTo(d.x, 0); ctx.lineTo(d.x, height);
+            ctx.stroke(); ctx.setLineDash([]);
+        }
+    }
+
+    function drawFocus(x, y) {
+        const p = toScreen(x, y);
+        ctx.fillStyle = '#2c3e50';
+        ctx.beginPath(); ctx.arc(p.x, p.y, 5, 0, Math.PI*2); ctx.fill();
+        ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.arc(p.x, p.y, 2, 0, Math.PI*2); ctx.fill();
+    }
+
+
+    // --- 3D ENGINE (THREE.JS) ---
+    let scene, camera, renderer, planeMesh, controls, coneGroup;
+    let is3DInitialized = false;
+
+    function init3D() {
+        if(is3DInitialized) return;
+
+        scene = new THREE.Scene();
+        scene.background = new THREE.Color(0xf0f2f5);
+        scene.fog = new THREE.Fog(0xf0f2f5, 20, 50);
+        
+        camera = new THREE.PerspectiveCamera(45, ui.container3D.clientWidth / ui.container3D.clientHeight, 0.1, 100);
+        camera.position.set(15, 8, 15);
+        
+        renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        renderer.setSize(ui.container3D.clientWidth, ui.container3D.clientHeight);
+        renderer.setPixelRatio(window.devicePixelRatio);
+        renderer.shadowMap.enabled = true;
+        ui.container3D.appendChild(renderer.domElement);
+        
+        controls = new OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
+        controls.dampingFactor = 0.05;
+        controls.minDistance = 5;
+        controls.maxDistance = 40;
+
+        // Lighting
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.7);
+        scene.add(ambientLight);
+        const dirLight = new THREE.DirectionalLight(0xffffff, 0.8);
+        dirLight.position.set(10, 20, 10);
+        dirLight.castShadow = true;
+        scene.add(dirLight);
+
+        // Ground
+        const groundGeo = new THREE.PlaneGeometry(50, 50);
+        const groundMat = new THREE.MeshPhongMaterial({ color: 0xe0e0e0, depthWrite: false });
+        const ground = new THREE.Mesh(groundGeo, groundMat);
+        ground.rotation.x = -Math.PI / 2;
+        ground.position.y = -5;
+        ground.receiveShadow = true;
+        scene.add(ground);
+        scene.add(new THREE.GridHelper(50, 50, 0xcccccc, 0xdddddd).translateY(-4.99));
+
+        // 1. The Double Cone
+        // Height 10 total (5 per cone). Base Radius 5. Angle = atan(5/5) = 45deg.
+        const coneHeight = 5;
+        const coneRadius = 5; 
+        // Use many segments for smooth intersection visually
+        const coneGeo = new THREE.ConeGeometry(coneRadius, coneHeight, 128, 1, true); 
+        const coneMat = new THREE.MeshPhongMaterial({ 
+            color: 0x3498db, 
+            side: THREE.DoubleSide, 
+            transparent: true, 
+            opacity: 0.7,
+            shininess: 100,
+            specular: 0x111111
+        });
+
+        const topCone = new THREE.Mesh(coneGeo, coneMat);
+        topCone.position.y = coneHeight/2;
+        topCone.castShadow = true;
+        
+        const botCone = new THREE.Mesh(coneGeo, coneMat);
+        botCone.rotation.x = Math.PI;
+        botCone.position.y = -coneHeight/2;
+        botCone.castShadow = true;
+
+        coneGroup = new THREE.Group();
+        coneGroup.add(topCone);
+        coneGroup.add(botCone);
+        scene.add(coneGroup);
+
+        // Axis line
+        const axisMat = new THREE.LineBasicMaterial({ color: 0x2c3e50, transparent: true, opacity: 0.5 });
+        const axisGeo = new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(0, -7, 0), new THREE.Vector3(0, 7, 0)]);
+        scene.add(new THREE.Line(axisGeo, axisMat));
+
+        // 2. The Cutting Plane
+        const planeGeo = new THREE.PlaneGeometry(15, 15);
+        const planeMat = new THREE.MeshPhongMaterial({ 
+            color: 0xe74c3c, 
+            side: THREE.DoubleSide, 
+            transparent: true, 
+            opacity: 0.5,
+            shininess: 50
+        });
+        planeMesh = new THREE.Mesh(planeGeo, planeMat);
+        scene.add(planeMesh);
+
+        is3DInitialized = true;
+        animate3D();
+    }
+
+    function update3DVisuals() {
+        if(!planeMesh) return;
+        
+        // Update plane position/rotation based on state
+        const rad = THREE.MathUtils.degToRad(state.cutAngle);
+        // Rotate around X axis to tilt relative to the vertical cone (Y-axis aligned)
+        // 0 deg = Horizontal plane. 90 deg = Vertical plane.
+        planeMesh.rotation.x = -rad; 
+        planeMesh.position.y = state.cutOffset;
+    }
+
+    function animate3D() {
+        requestAnimationFrame(animate3D);
+        if(controls) controls.update();
+        // Only render 3D if visible to save resources
+        if(state.mode === '3D') {
+             renderer.render(scene, camera);
+        }
+    }
+    
+    function resize3D() {
+        if(!camera || !renderer) return;
+        camera.aspect = ui.container3D.clientWidth / ui.container3D.clientHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(ui.container3D.clientWidth, ui.container3D.clientHeight);
+    }
+
+
+    // --- CORE LOGIC : BRIDGE 3D -> 2D ---
+
+    // This is the "magic" function that interprets the 3D geometry into 2D parameters.
+    // It uses heuristics to approximate the geometric result for visual feedback.
+    function calculate2DFrom3D() {
+        const beta = state.cutAngle; // Plane angle with horizontal
+        const alpha = CONE_SEMI_ANGLE; // 45 deg
+        const h = Math.abs(state.cutOffset); // distance from apex
+        const baseSize = Math.max(0.1, h); // avoid zero size
+
+        // Threshold window for parabola to avoid floating point flickering around exactly 45
+        const epsilon = 0.5; 
+
+        if (beta > alpha - epsilon && beta < alpha + epsilon) {
+            // --- PARABOLA ZONE (approx 45°) ---
+             if (state.type !== 'parabola') {
+                state.type = 'parabola';
+                ui.inputType.value = 'parabola';
+                uiUpdateVisibility();
+            }
+            // The parameter 'p' is proportional to distance from apex.
+            // Visual calibration factor included.
+            state.p = baseSize * 0.7 + 0.1;
+        }
+        else if (beta < alpha - epsilon) {
+            // --- ELLIPSE ZONE (< 45°) ---
+            if (state.type !== 'ellipse') {
+                state.type = 'ellipse';
+                ui.inputType.value = 'ellipse';
+                uiUpdateVisibility();
+            }
+            
+            // Heuristic mapping:
+            // 'b' (minor axis) depends primarily on the "radius" of the cone at that height (h).
+            state.b = baseSize * 1.2 + 0.1;
+
+            // 'a' (major axis) depends on 'b' and how close the angle is to 45°.
+            // As beta -> 45, the denominator -> 0, so 'a' -> infinity.
+            let angleFactor = Math.cos(THREE.MathUtils.degToRad(beta)) - Math.cos(THREE.MathUtils.degToRad(alpha));
+            angleFactor = Math.max(0.05, angleFactor); // Avoid division by zero
+            
+            // Calibration to make visually pleasing sizes
+            state.a = state.b * (0.2 / angleFactor); 
+
+        }
+        else if (beta > alpha + epsilon) {
+             // --- HYPERBOLA ZONE (> 45°) ---
+             if (state.type !== 'hyperbola') {
+                state.type = 'hyperbola';
+                ui.inputType.value = 'hyperbola';
+                uiUpdateVisibility();
+            }
+
+            // Heuristic mapping:
+            // 'a' relates to the distance from center to vertex, related to h.
+            state.a = baseSize * 0.8 + 0.2;
+
+            // 'b' relates to the slope of asymptotes. Steeper angle = wider opening.
+            let angleRatio = (beta - alpha) / (90 - alpha); // 0 near 45, 1 at 90.
+            state.b = state.a * (0.5 + angleRatio * 3);
+        }
+
+        // Clamp values to keep 2D view sane and fit nicely
+        state.a = Math.min(Math.max(0.1, state.a), 15);
+        state.b = Math.min(Math.max(0.1, state.b), 15);
+        state.p = Math.min(Math.max(0.1, state.p), 8);
+
+        // Update UI sliders to reflect new calculated state
+        ui.inputA.value = state.a.toFixed(2);
+        ui.inputB.value = state.b.toFixed(2);
+        ui.inputP.value = state.p.toFixed(2);
+    }
+
+
+    // --- MATH & UI UPDATES ---
+
+    function updateLabels() {
+        ui.valA.innerText = state.a.toFixed(2);
+        ui.valB.innerText = state.b.toFixed(2);
+        ui.valP.innerText = state.p.toFixed(2);
+        ui.valAngle.innerText = state.cutAngle.toFixed(1) + "°";
+        ui.valOffset.innerText = state.cutOffset.toFixed(2);
+
+        // Visual cue for driven mode
+        if(state.isDrivenBy3D) {
+            ui.ctrl2DContainer.classList.add('driven-by-3d');
+        } else {
+            ui.ctrl2DContainer.classList.remove('driven-by-3d');
+        }
+    }
+
+    function uiUpdateVisibility() {
+        if(state.type === 'parabola') {
+            ui.ctrlA.classList.add('hidden');
+            ui.ctrlB.classList.add('hidden');
+            ui.ctrlP.classList.remove('hidden');
+        } else {
+            ui.ctrlA.classList.remove('hidden');
+            ui.ctrlB.classList.remove('hidden');
+            ui.ctrlP.classList.add('hidden');
+        }
+    }
+
+    function updateMathSafe() {
+        // Robust check for KaTeX availability
+        if (!window.katex || typeof window.katex.render !== 'function') {
+            // Retry once after a short delay if loading slow
+            if(!state.katexRetried) {
+                 state.katexRetried = true;
+                 setTimeout(updateMathSafe, 500);
+            } else {
+                 ui.eqCartesian.textContent = "Chargement des maths...";
+            }
+            return;
+        }
+
+        let latexCart = "", latexParams = "", latexPolar = "";
+        const precision = 2;
+
+        try {
+            if (state.type === 'ellipse') {
+                const a = Math.max(state.a, 0.01), b = Math.max(state.b, 0.01);
+                latexCart = `\\frac{x^2}{${a.toFixed(precision)}^2} + \\frac{y^2}{${b.toFixed(precision)}^2} = 1`;
+                const c = Math.sqrt(Math.abs(a*a - b*b));
+                const aMax = Math.max(a,b);
+                const e = c / (aMax > 0 ? aMax : 1);
+                // p = b^2 / a (if a>b)
+                const p = (b*b) / a; 
+                latexParams = `e = ${e.toFixed(3)}, \\quad c = ${c.toFixed(precision)}, \\quad p \\approx ${p.toFixed(precision)}`;
+                latexPolar = `r(\\theta) = \\frac{${p.toFixed(precision)}}{1 + ${e.toFixed(3)}\\cos(\\theta)}`;
+            } 
+            else if (state.type === 'hyperbola') {
+                const a = Math.max(state.a, 0.01), b = Math.max(state.b, 0.01);
+                latexCart = `\\frac{x^2}{${a.toFixed(precision)}^2} - \\frac{y^2}{${b.toFixed(precision)}^2} = 1`;
+                const c = Math.sqrt(a*a + b*b);
+                const e = c / a;
+                latexParams = `e = ${e.toFixed(3)}, \\quad c = ${c.toFixed(precision)}`;
+                const p = (b*b)/a;
+                latexPolar = `r(\\theta) = \\frac{${p.toFixed(precision)}}{1 + ${e.toFixed(3)}\\cos(\\theta)} \\quad (\\text{branche droite})`;
+            }
+            else if (state.type === 'parabola') {
+                latexCart = `y^2 = ${2 * state.p.toFixed(precision)}x`;
+                latexParams = `e = 1, \\quad p = ${state.p.toFixed(precision)}`;
+                latexPolar = `r(\\theta) = \\frac{${state.p.toFixed(precision)}}{1 + \\cos(\\theta)}`;
+            }
+
+            // Render
+            katex.render(latexCart, ui.eqCartesian, { throwOnError: false, displayMode: true });
+            katex.render(latexParams, ui.eqParams, { throwOnError: false, displayMode: true });
+            katex.render(latexPolar, ui.eqPolar, { throwOnError: false, displayMode: true });
+        } catch (err) {
+            console.error("KaTeX Rendering Error:", err);
+            ui.eqCartesian.textContent = "Erreur d'affichage mathématique";
+        }
+    }
+
+    // --- MAIN UPDATE LOOP ---
+    function fullUpdate() {
+        if(state.isDrivenBy3D) {
+             calculate2DFrom3D();
+        }
+        updateLabels();
+        updateMathSafe();
+        render2D();
+        update3DVisuals();
+    }
+
+    // --- EVENT HANDLING ---
+
+    window.switchMode = (mode) => {
+        state.mode = mode;
+        ui.btns.forEach(b => b.classList.remove('active'));
+        if(mode === '2D') {
+            ui.btns[0].classList.add('active');
+            ui.container3D.style.visibility = 'hidden';
+            ui.container3D.style.pointerEvents = 'none';
+        } else {
+            ui.btns[1].classList.add('active');
+            ui.container3D.style.visibility = 'visible';
+            ui.container3D.style.pointerEvents = 'auto';
+            if(!is3DInitialized) init3D();
+            resize3D();
+        }
+        // Always render 2D background
+        render2D();
+    };
+
+    // Type selector (Manual override)
+    ui.inputType.addEventListener('change', (e) => {
+        state.type = e.target.value;
+        // If user manually changes type, stop 3D driving temporarily until they touch 3D controls again
+        state.isDrivenBy3D = false; 
+        uiUpdateVisibility();
+        fullUpdate();
+    });
+
+    // 2D Sliders inputs
+    const handle2DInput = () => {
+        state.isDrivenBy3D = false; // User took manual control
+        state.a = parseFloat(ui.inputA.value);
+        state.b = parseFloat(ui.inputB.value);
+        state.p = parseFloat(ui.inputP.value);
+        fullUpdate();
+    }
+    [ui.inputA, ui.inputB, ui.inputP].forEach(el => el.addEventListener('input', handle2DInput));
+
+    // 3D Sliders inputs (The driver)
+    const handle3DInput = () => {
+        state.isDrivenBy3D = true; // 3D is now driving 2D
+        state.cutAngle = parseFloat(ui.inputAngle.value);
+        state.cutOffset = parseFloat(ui.inputOffset.value);
+        // Switch to 3D view automatically if interacting with 3D controls?
+        // Let's keep user preference for now.
+        fullUpdate();
+    }
+    [ui.inputAngle, ui.inputOffset].forEach(el => el.addEventListener('input', handle3DInput));
+
+    window.addEventListener('resize', () => {
+        resize2D();
+        resize3D();
+    });
+
+    // Init
+    // Give KaTeX a moment to load before first render attempt
+    setTimeout(() => {
+         resize2D();
+         uiUpdateVisibility();
+         fullUpdate();
+         // Pre-init 3D so it's ready
+         init3D(); 
+    }, 300);
+
+</script>
+</body>
+</html>

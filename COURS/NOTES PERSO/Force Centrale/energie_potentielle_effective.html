@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Énergie Potentielle Effective</title>
+    
+    <!-- Intégration de KaTeX -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --text-color: #e2e8f0;
+            --accent-color: #38bdf8;   /* Cyan pour E_eff */
+            --energy-color: #fbbf24;   /* Jaune pour Em */
+            --grav-color: #94a3b8;     /* Gris pour Gravité */
+            --centri-color: #f472b6;   /* Rose pour Centrifuge */
+            --allowed-bg: rgba(34, 197, 94, 0.15); /* Vert transparent */
+            --forbidden-bg: rgba(244, 63, 94, 0.15); /* Rouge transparent */
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+            max-width: 800px;
+            max-height: 500px;
+        }
+
+        .controls {
+            position: absolute;
+            bottom: 20px;
+            background: rgba(30, 41, 59, 0.9);
+            padding: 15px 25px;
+            border-radius: 12px;
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            gap: 30px;
+            align-items: center;
+            font-size: 0.9rem;
+            z-index: 10;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+        }
+
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        label {
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: #cbd5e1;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+        }
+
+        input[type="range"] {
+            width: 180px;
+            cursor: pointer;
+            accent-color: var(--accent-color);
+        }
+
+        /* Légende flottante */
+        .legend {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(30, 41, 59, 0.85);
+            padding: 15px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            pointer-events: none;
+            backdrop-filter: blur(4px);
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 8px;
+            color: #e2e8f0;
+        }
+        
+        .legend-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .line-sample {
+            width: 20px;
+            height: 2px;
+            flex-shrink: 0;
+        }
+
+        .dashed { border-top: 2px dashed; height: 0; }
+        .solid { height: 2px; }
+
+        .noscript-warning {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(220, 38, 38, 0.9);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            z-index: 100;
+        }
+
+        .katex-label {
+            position: absolute;
+            pointer-events: none;
+            font-size: 14px;
+            font-weight: bold;
+            color: #e2e8f0;
+            transform: translateX(-50%);
+            z-index: 5;
+            text-shadow: 0 0 4px rgba(0,0,0,0.8);
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <noscript>
+        <div class="noscript-warning">JavaScript est requis pour l'animation.</div>
+    </noscript>
+
+    <div class="legend">
+        <div class="legend-item">
+            <div class="line-sample solid" style="background:var(--accent-color)"></div> 
+            <span>$E_{p,eff}$ (Effective)</span>
+        </div>
+        <div class="legend-item">
+            <div class="line-sample solid" style="background:var(--energy-color)"></div> 
+            <span>$E_m$ (Mécanique Totale)</span>
+        </div>
+        <div class="legend-item">
+            <div class="line-sample dashed" style="border-color:var(--grav-color)"></div> 
+            <span>Attraction $\sim -1/r$</span>
+        </div>
+        <div class="legend-item">
+            <div class="line-sample dashed" style="border-color:var(--centri-color)"></div> 
+            <span>Barrière $\sim 1/r^2$</span>
+        </div>
+    </div>
+
+    <canvas id="graphCanvas"></canvas>
+
+    <!-- Labels KaTeX pour r_min et r_max -->
+    <div id="labelRmin" class="katex-label" style="display:none;"></div>
+    <div id="labelRmax" class="katex-label" style="display:none;"></div>
+
+    <div class="controls">
+        <div class="control-group">
+            <label><span>Énergie $E_m$:</span> <span id="valEm" style="font-family:monospace">-0.5</span></label>
+            <input type="range" id="sliderEm" min="-1.5" max="0.5" step="0.01" value="-0.5">
+        </div>
+        <div class="control-group">
+            <label><span>Moment $L$:</span> <span id="valL" style="font-family:monospace">1.2</span></label>
+            <input type="range" id="sliderL" min="0.5" max="2.0" step="0.05" value="1.2">
+        </div>
+    </div>
+</div>
+
+<script>
+    // Initialisation sécurisée de KaTeX
+    document.addEventListener("DOMContentLoaded", function() {
+        if (typeof renderMathInElement !== 'undefined') {
+            renderMathInElement(document.body, {
+                delimiters: [
+                    {left: '$$', right: '$$', display: true},
+                    {left: '$', right: '$', display: false}
+                ]
+            });
+        }
+    });
+
+{ // Scope Isolation
+
+    const canvas = document.getElementById('graphCanvas');
+    const ctx = canvas.getContext('2d');
+    const sliderEm = document.getElementById('sliderEm');
+    const sliderL = document.getElementById('sliderL');
+    const valEm = document.getElementById('valEm');
+    const valL = document.getElementById('valL');
+    const labelRmin = document.getElementById('labelRmin');
+    const labelRmax = document.getElementById('labelRmax');
+
+    // Initialiser les labels KaTeX une seule fois
+    if (typeof katex !== 'undefined') {
+        labelRmin.innerHTML = katex.renderToString('r_{\\min}', { throwOnError: false });
+        labelRmax.innerHTML = katex.renderToString('r_{\\max}', { throwOnError: false });
+    }
+
+    // Paramètres physiques simulés
+    let Em = -0.5;
+    let L_val = 1.2;
+    const k = 1.5; 
+    const m = 1;
+
+    // Paramètres d'affichage
+    let width, height;
+    const rMaxGraph = 6;
+    const yRange = { min: -2.5, max: 1.5 };
+    const padding = { top: 40, right: 40, bottom: 40, left: 60 };
+
+    function resize() {
+        if (!canvas.parentElement) return;
+        const parent = canvas.parentElement;
+        canvas.width = parent.clientWidth || 800;
+        canvas.height = parent.clientHeight || 500;
+        width = canvas.width;
+        height = canvas.height;
+        draw();
+    }
+    window.addEventListener('resize', resize);
+    setTimeout(resize, 0);
+
+    function mapX(r) {
+        return padding.left + (r / rMaxGraph) * (width - padding.left - padding.right);
+    }
+
+    function mapY(E) {
+        const range = yRange.max - yRange.min;
+        const normalized = (E - yRange.min) / range;
+        return height - padding.bottom - (normalized * (height - padding.top - padding.bottom));
+    }
+
+    function getEp(r) { return -k / r; }
+    function getEcen(r) { return (L_val * L_val) / (2 * m * r * r); }
+    function getEeff(r) { return getEp(r) + getEcen(r); }
+
+    function draw() {
+        if (!width || !height) return;
+
+        // MAJ Valeurs
+        Em = parseFloat(sliderEm.value);
+        L_val = parseFloat(sliderL.value);
+        valEm.innerText = Em.toFixed(2);
+        valL.innerText = L_val.toFixed(2);
+
+        // Nettoyage
+        ctx.fillStyle = '#0f172a';
+        ctx.fillRect(0, 0, width, height);
+
+        // --- 1. Dessin des Axes ---
+        ctx.beginPath();
+        ctx.strokeStyle = '#475569';
+        ctx.lineWidth = 1;
+        
+        const yZero = mapY(0);
+        ctx.moveTo(padding.left, yZero);
+        ctx.lineTo(width - padding.right, yZero);
+        
+        ctx.moveTo(padding.left, padding.top);
+        ctx.lineTo(padding.left, height - padding.bottom);
+        ctx.stroke();
+
+        // Labels Axes
+        ctx.fillStyle = '#94a3b8';
+        ctx.font = '14px sans-serif';
+        ctx.fillText('Distance r', width - 80, yZero - 10);
+        
+        ctx.save();
+        ctx.translate(20, height / 2);
+        ctx.rotate(-Math.PI / 2);
+        ctx.fillText('Énergie E', 0, 0);
+        ctx.restore();
+
+        // --- 2. Calcul Intersection ---
+        const A = 2 * m * Em;
+        const B = 2 * m * k;
+        const C = -(L_val * L_val);
+        let r1 = null, r2 = null;
+        let hasOrbits = false;
+
+        if (Math.abs(A) < 0.001) {
+            r1 = -C / B;
+            hasOrbits = true;
+        } else {
+            const delta = B * B - 4 * A * C;
+            if (delta >= 0) {
+                hasOrbits = true;
+                const sqrtDelta = Math.sqrt(delta);
+                const sol1 = (-B - sqrtDelta) / (2 * A);
+                const sol2 = (-B + sqrtDelta) / (2 * A);
+                const sols = [sol1, sol2].filter(r => r > 0).sort((a,b) => a-b);
+                if (sols.length > 0) r1 = sols[0];
+                if (sols.length > 1) r2 = sols[1];
+            }
+        }
+
+        const eMin = -(m*k*k)/(2*L_val*L_val);
+        if (Em < eMin) hasOrbits = false;
+
+        // --- 3. Zones ---
+
+        // 3a. Zone Interdite (Gauche) - NOUVEAU
+        if (hasOrbits && r1) {
+            const xAxisStart = mapX(0); 
+            const xRmin = mapX(r1);
+            const widthZone = xRmin - xAxisStart;
+
+            if (widthZone > 5) { 
+                ctx.save();
+                ctx.fillStyle = 'rgba(244, 63, 94, 0.15)'; // Rose/Rouge transparent
+                ctx.fillRect(xAxisStart, padding.top, widthZone, height - padding.top - padding.bottom);
+                
+                // Texte explicatif si assez de place
+                if (widthZone > 140) {
+                     ctx.fillStyle = '#fda4af'; // Rose clair
+                     ctx.textAlign = 'center';
+                     ctx.font = 'bold 12px sans-serif';
+                     const midX = xAxisStart + widthZone / 2;
+                     const midY = (padding.top + height - padding.bottom) / 2;
+                     
+                     ctx.fillText("ZONE INTERDITE", midX, midY - 15);
+                     ctx.font = 'italic 12px sans-serif';
+                     ctx.fillText("Barrière Centrifuge", midX, midY + 5);
+                     ctx.fillStyle = '#f472b6';
+                     ctx.fillText("(Rebond sur le potentiel)", midX, midY + 25);
+                }
+                ctx.restore();
+            }
+        }
+
+        // 3b. Zone Permise (Droite)
+        ctx.save();
+        ctx.beginPath();
+        let startFill = r1 ? r1 : 0.2;
+        let endFill = r2 ? r2 : rMaxGraph;
+        
+        if (hasOrbits) {
+            for (let r = startFill; r <= endFill; r += 0.01) {
+                const yEff = mapY(getEeff(r));
+                const yEm = mapY(Em);
+                if (yEff < 0 || yEff > height) continue;
+                if (r === startFill) ctx.moveTo(mapX(r), yEm);
+                ctx.lineTo(mapX(r), yEff);
+            }
+            ctx.lineTo(mapX(endFill), mapY(Em));
+            ctx.closePath();
+            ctx.fillStyle = 'rgba(34, 197, 94, 0.15)'; // Vert transparent
+            ctx.fill();
+        }
+        ctx.restore();
+
+
+        // --- 4. Courbes ---
+        function drawCurve(func, color, dash = []) {
+            ctx.beginPath();
+            ctx.strokeStyle = color;
+            ctx.setLineDash(dash);
+            ctx.lineWidth = 2;
+            let first = true;
+            for (let r = 0.2; r < rMaxGraph; r += 0.02) {
+                let val = func(r);
+                if (val > yRange.max * 2 || val < yRange.min * 2) continue;
+                let px = mapX(r);
+                let py = mapY(val);
+                if (py < padding.top || py > height - padding.bottom) {
+                    first = true; continue;
+                }
+                if (first) { ctx.moveTo(px, py); first = false; }
+                else { ctx.lineTo(px, py); }
+            }
+            ctx.stroke();
+            ctx.setLineDash([]);
+        }
+
+        drawCurve(getEp, '#94a3b8', [5, 5]);
+        drawCurve(getEcen, '#f472b6', [5, 5]);
+        drawCurve(getEeff, '#38bdf8');
+
+        // --- 5. Ligne Em ---
+        const yEm = mapY(Em);
+        if (yEm > padding.top && yEm < height - padding.bottom) {
+            ctx.beginPath();
+            ctx.strokeStyle = '#fbbf24';
+            ctx.lineWidth = 2;
+            ctx.moveTo(padding.left, yEm);
+            ctx.lineTo(width - padding.right, yEm);
+            ctx.stroke();
+        }
+
+        // --- 6. Marqueurs ---
+        // Cacher les labels par défaut
+        labelRmin.style.display = 'none';
+        labelRmax.style.display = 'none';
+
+        if (hasOrbits) {
+            ctx.fillStyle = '#e2e8f0';
+            ctx.textAlign = 'center';
+            
+            // Obtenir la position du canvas pour positionner les labels
+            const canvasRect = canvas.getBoundingClientRect();
+            const scaleX = canvas.width / canvasRect.width;
+            const scaleY = canvas.height / canvasRect.height;
+            
+            if (r1) {
+                const x1 = mapX(r1);
+                ctx.beginPath();
+                ctx.arc(x1, yEm, 4, 0, Math.PI*2);
+                ctx.fill();
+                
+                // Positionner le label KaTeX r_min
+                labelRmin.style.display = 'block';
+                labelRmin.style.left = (canvasRect.left + x1 / scaleX) + 'px';
+                labelRmin.style.top = (canvasRect.top + (yEm - 20) / scaleY) + 'px';
+                
+                // Ligne pointillée
+                ctx.beginPath();
+                ctx.strokeStyle = 'rgba(255,255,255,0.1)';
+                ctx.setLineDash([2,2]);
+                ctx.moveTo(x1, yEm);
+                ctx.lineTo(x1, mapY(yRange.min));
+                ctx.stroke();
+            }
+
+            if (r2) {
+                const x2 = mapX(r2);
+                ctx.beginPath();
+                ctx.arc(x2, yEm, 4, 0, Math.PI*2);
+                ctx.fill();
+                
+                // Positionner le label KaTeX r_max
+                labelRmax.style.display = 'block';
+                labelRmax.style.left = (canvasRect.left + x2 / scaleX) + 'px';
+                labelRmax.style.top = (canvasRect.top + (yEm - 20) / scaleY) + 'px';
+                
+                ctx.beginPath();
+                ctx.moveTo(x2, yEm);
+                ctx.lineTo(x2, mapY(yRange.min));
+                ctx.stroke();
+            }
+        } else {
+            ctx.fillStyle = '#ef4444';
+            ctx.textAlign = 'center';
+            ctx.font = 'bold 16px sans-serif';
+            ctx.fillText('Impossible', width/2, height/2);
+            ctx.font = '14px sans-serif';
+            ctx.fillText('(Énergie insuffisante pour orbiter)', width/2, height/2 + 25);
+        }
+        
+        ctx.textAlign = 'left';
+    }
+
+    sliderEm.addEventListener('input', draw);
+    sliderL.addEventListener('input', draw);
+    draw();
+
+} 
+</script>
+</body>
+</html>

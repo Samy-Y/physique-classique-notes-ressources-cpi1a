@@ -1,0 +1,146 @@
+\documentclass{article}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{geometry}
+\geometry{a4paper, margin=1in}
+\usepackage{graphicx}
+
+\title{Résumé des Formules de Mécanique du Point Matériel}
+\author{D'après le cours de CPI1A}
+\date{Octobre 2025}
+
+\begin{document}
+\maketitle
+
+\section{Chapitre 1: Cinématique classique du point}
+
+\subsection{Systèmes de Coordonnées}
+
+\subsubsection{Coordonnées Cartésiennes}
+Le vecteur position d'un point $M$ est donné par ses coordonnées $(x, y, z)$.
+\begin{equation*}
+    \vec{OM} = x\vec{e}_{x} + y\vec{e}_{y} + z\vec{e}_{z} \quad \text{avec} \quad x, y, z \in ]-\infty, +\infty[
+\end{equation*}
+
+\subsubsection{Coordonnées Cylindriques}
+Les coordonnées d'un point $M$ sont $(r, \theta, z)$.
+\begin{itemize}
+    \item Relation avec les coordonnées cartésiennes:
+    \begin{equation*}
+        \begin{cases}
+            x = r\cos\theta \\
+            y = r\sin\theta \\
+            z = z
+        \end{cases}
+    \end{equation*}
+    \item Domaine de définition:
+    \begin{equation*}
+        r \in [0, +\infty[, \quad 0 \le \theta \le 2\pi, \quad z \in ]-\infty, +\infty[
+    \end{equation*}
+    \item Vecteur position dans la base locale $(\vec{e}_{r}, \vec{e}_{\theta}, \vec{e}_{z})$:
+    \begin{equation*}
+        \vec{OM} = r\vec{e}_{r} + z\vec{e}_{z}
+    \end{equation*}
+    \item Dérivées des vecteurs de base par rapport à l'angle de rotation $\theta$:
+    \begin{equation*}
+        \frac{d\vec{e}_{r}}{d\theta} = \vec{e}_{\theta} \quad \text{et} \quad \frac{d\vec{e}_{\theta}}{d\theta} = -\vec{e}_{r}
+    \end{equation*}
+\end{itemize}
+
+\subsubsection{Coordonnées Sphériques}
+Les coordonnées d'un point $M$ sont $(r, \theta, \varphi)$.
+\begin{itemize}
+    \item Relation avec les coordonnées cartésiennes:
+    \begin{equation*}
+        \begin{cases}
+            x = r\sin\theta\cos\varphi \\
+            y = r\sin\theta\sin\varphi \\
+            z = r\cos\theta
+        \end{cases}
+    \end{equation*}
+    \item Domaine de définition:
+    \begin{equation*}
+        r \in [0, +\infty[, \quad \theta \in [0, \pi], \quad \varphi \in [0, 2\pi]
+    \end{equation*}
+    \item Vecteur position dans la base locale $(\vec{e}_{r}, \vec{e}_{\theta}, \vec{e}_{\varphi})$:
+    \begin{equation*}
+        \vec{OM} = r\vec{e}_{r}
+    \end{equation*}
+\end{itemize}
+
+\subsection{Grandeurs Cinématiques}
+
+\subsubsection{Vitesse}
+Définition de la vitesse instantanée dans un référentiel $\mathcal{R}$:
+\begin{equation*}
+    \vec{v}_{(M/\mathcal{R})} = \frac{d\vec{OM}}{dt}\bigg/\mathcal{R}
+\end{equation*}
+\begin{itemize}
+    \item Dans la base cartésienne:
+    \begin{equation*}
+        \vec{v} = \dot{x}\vec{e}_{x} + \dot{y}\vec{e}_{y} + \dot{z}\vec{e}_{z}
+    \end{equation*}
+    \item Dans la base cylindrique:
+    \begin{equation*}
+        \vec{v} = \dot{r}\vec{e}_{r} + r\dot{\theta}\vec{e}_{\theta} + \dot{z}\vec{e}_{z}
+    \end{equation*}
+    \item Dans la base sphérique:
+    \begin{equation*}
+        \vec{v} = \dot{r}\vec{e}_{r} + r\dot{\theta}\vec{e}_{\theta} + r\sin\theta\dot{\varphi}\vec{e}_{\varphi}
+    \end{equation*}
+    \item Dans la base de Frenet:
+    \begin{equation*}
+        \vec{v} = \dot{s}\vec{t}
+    \end{equation*}
+\end{itemize}
+
+\subsubsection{Accélération}
+Définition de l'accélération instantanée dans un référentiel $\mathcal{R}$:
+\begin{equation*}
+    \vec{a}_{(M/\mathcal{R})} = \frac{d\vec{v}_{(M/\mathcal{R})}}{dt}\bigg/\mathcal{R} = \frac{d^{2}\vec{OM}}{dt^{2}}\bigg/\mathcal{R}
+\end{equation*}
+\begin{itemize}
+    \item Dans la base cartésienne:
+    \begin{equation*}
+        \vec{a} = \ddot{x}\vec{e}_{x} + \ddot{y}\vec{e}_{y} + \ddot{z}\vec{e}_{z}
+    \end{equation*}
+    \item Dans la base cylindrique:
+    \begin{equation*}
+        \vec{a} = (\ddot{r} - r\dot{\theta}^{2})\vec{e}_{r} + (2\dot{r}\dot{\theta} + r\ddot{\theta})\vec{e}_{\theta} + \ddot{z}\vec{e}_{z}
+    \end{equation*}
+    \item Dans la base de Frenet:
+    \begin{equation*}
+        \vec{a} = \ddot{s}\vec{t} + \frac{\dot{s}^{2}}{R_{c}}\vec{n} = \dot{v}\vec{t} + \frac{v^{2}}{R_{c}}\vec{n}
+    \end{equation*}
+\end{itemize}
+
+\section{Chapitre 2: Changement de Référentiel}
+
+\subsection{Composition des Vitesses}
+La loi de composition des vitesses relie la vitesse absolue, la vitesse relative et la vitesse d'entraînement:
+\begin{equation*}
+    \vec{v}_{(M/R)} = \vec{v}_{(M/R')} + \vec{v}_{e}(M)
+\end{equation*}
+Avec la vitesse d'entraînement:
+\begin{equation*}
+    \vec{v}_{e}(M) = \vec{v}_{(O'/R)} + \vec{\Omega}_{(R'/R)} \wedge \vec{O'M}
+\end{equation*}
+
+\subsection{Composition des Accélérations}
+La loi de composition des accélérations s'exprime comme la somme de trois termes:
+\begin{equation*}
+    \vec{a}_{(M/R)} = \vec{a}_{(M/R')} + \vec{a}_{e}(M) + \vec{a}_{c}(M)
+\end{equation*}
+\begin{itemize}
+    \item Accélération d'entraînement:
+    \begin{equation*}
+        \vec{a}_{e}(M) = \vec{a}_{(O'/R)} + \vec{\Omega}_{(R'/R)} \wedge [\vec{\Omega}_{(R'/R)} \wedge \vec{O'M}] + \frac{d\vec{\Omega}_{(R'/R)}}{dt}\bigg/R \wedge \vec{O'M}
+    \end{equation*}
+    \item Accélération de Coriolis:
+    \begin{equation*}
+        \vec{a}_{c}(M) = 2\vec{\Omega}_{(R'/R)} \wedge \vec{v}_{(M/R')}
+    \end{equation*}
+\end{itemize}
+
+\end{document}

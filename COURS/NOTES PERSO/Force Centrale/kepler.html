@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Visualisation 2ème Loi de Kepler</title>
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --text-color: #e2e8f0;
+            --accent-color: #38bdf8;
+            --sun-color: #fbbf24;
+            --planet-color: #f472b6;
+            --sector-color: rgba(56, 189, 248, 0.4);
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+            max-width: 800px;
+            max-height: 600px;
+        }
+
+        .controls {
+            position: absolute;
+            bottom: 20px;
+            background: rgba(30, 41, 59, 0.8);
+            padding: 15px;
+            border-radius: 12px;
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            font-size: 0.9rem;
+            z-index: 10;
+        }
+
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        label {
+            font-weight: 600;
+            font-size: 0.8rem;
+            color: #94a3b8;
+        }
+
+        input[type="range"] {
+            width: 150px;
+            cursor: pointer;
+        }
+
+        .info-overlay {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            pointer-events: none;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            background: rgba(30, 41, 59, 0.6);
+            padding: 10px;
+            border-radius: 8px;
+            max-width: 250px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 4px;
+        }
+
+        .dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="info-overlay">
+        <strong>Loi des Aires (Kepler)</strong><br>
+        <div style="font-size: 0.8em; margin-top:5px; color:#cbd5e1;">
+            Le rayon vecteur balaie des aires égales en des temps égaux ($\Delta t$ constant).
+        </div>
+        <div style="margin-top: 10px;">
+            <div class="legend-item"><div class="dot" style="background:var(--sun-color)"></div> Soleil (Foyer)</div>
+            <div class="legend-item"><div class="dot" style="background:var(--planet-color)"></div> Planète</div>
+            <div class="legend-item"><div class="dot" style="background:var(--accent-color)"></div> Aire balayée</div>
+        </div>
+    </div>
+
+    <canvas id="simulationCanvas"></canvas>
+
+    <div class="controls">
+        <div class="control-group">
+            <label for="eccentricity">Excentricité ($e$): <span id="eValue">0.60</span></label>
+            <input type="range" id="eccentricity" min="0" max="0.85" step="0.01" value="0.60">
+        </div>
+        <div class="control-group">
+            <label for="speed">Vitesse de simulation</label>
+            <input type="range" id="speed" min="1" max="10" step="1" value="3">
+        </div>
+    </div>
+</div>
+
+<script>
+    const canvas = document.getElementById('simulationCanvas');
+    const ctx = canvas.getContext('2d');
+    const eSlider = document.getElementById('eccentricity');
+    const speedSlider = document.getElementById('speed');
+    const eValueSpan = document.getElementById('eValue');
+
+    // Simulation State
+    let width, height, cx, cy;
+    let angle = 0; // True anomaly
+    let eccentricity = 0.6;
+    let baseSpeed = 0.05; // Base angular velocity factor
+    const semiMajorAxisPixels = 200; // Visual scale
+
+    // Area Sweeping Logic
+    let sweepPoints = [];
+    let isSweeping = false;
+    let sweepTimer = 0;
+    const sweepDuration = 30; // Frames to sweep
+    const sweepInterval = 80; // Frames between sweeps
+    let savedSectors = [];
+    const maxSavedSectors = 6;
+
+    // Resize handler
+    function resize() {
+        const parent = canvas.parentElement;
+        canvas.width = parent.clientWidth;
+        canvas.height = parent.clientHeight;
+        width = canvas.width;
+        height = canvas.height;
+        cx = width / 2;
+        cy = height / 2;
+    }
+    window.addEventListener('resize', resize);
+    resize();
+
+    // Physics helper: Calculate radius based on angle and eccentricity
+    // r = p / (1 + e * cos(theta))
+    // p = a * (1 - e^2)
+    function getRadius(theta, e, a) {
+        const p = a * (1 - e * e);
+        return p / (1 + e * Math.cos(theta));
+    }
+
+    // Main Loop
+    function loop() {
+        // 1. Update Physics
+        eccentricity = parseFloat(eSlider.value);
+        eValueSpan.textContent = eccentricity.toFixed(2);
+        
+        const r = getRadius(angle, eccentricity, semiMajorAxisPixels);
+        
+        // Kepler's 2nd Law in Math: r² * d(theta)/dt = Constant
+        // Therefore: d(theta) = Constant / r²
+        // We simulate this by adjusting the angle increment based on current radius
+        const speedMult = parseFloat(speedSlider.value);
+        // Scaling constant to keep animation speed reasonable
+        const k = baseSpeed * 50000; 
+        const dTheta = (k * speedMult) / (r * r * 100);
+        
+        angle += dTheta;
+
+        // Cartesian coordinates (relative to focus at 0,0)
+        // Note: For ellipse eq r = p/(1+e cos theta), focus is at origin.
+        const x = r * Math.cos(angle);
+        const y = r * Math.sin(angle);
+
+        // 2. Logic for Sweeping Areas
+        sweepTimer++;
+        
+        // Start a new sweep
+        if (!isSweeping && sweepTimer > sweepInterval) {
+            isSweeping = true;
+            sweepTimer = 0;
+            sweepPoints = []; // Start new sector
+            // Always push the focus (0,0) as the first point of the polygon
+            sweepPoints.push({x: 0, y: 0}); 
+        }
+
+        // Record points if sweeping
+        if (isSweeping) {
+            sweepPoints.push({x: x, y: y});
+            
+            // End sweep
+            if (sweepTimer > sweepDuration) {
+                isSweeping = false;
+                sweepTimer = 0;
+                savedSectors.push([...sweepPoints]); // Save copy
+                if (savedSectors.length > maxSavedSectors) {
+                    savedSectors.shift(); // Remove oldest
+                }
+            }
+        }
+
+        // 3. Drawing
+        ctx.fillStyle = '#0f172a'; // Clear bg
+        ctx.fillRect(0, 0, width, height);
+
+        ctx.save();
+        ctx.translate(cx, cy); // Move origin to center of screen
+        
+        // Center the orbit visually. 
+        // The mathematical focus is at (0,0). 
+        // To center the ellipse on screen, we need to shift by c = a*e
+        // But since we are drawing based on the Focus, let's keep Focus at center for clarity,
+        // OR shift everything so the ellipse center is at screen center.
+        // Let's shift so ellipse center is roughly center.
+        // Distance center-to-focus is c = a*e. Focus is at 0. Ellipse center is at -c.
+        const centerShift = semiMajorAxisPixels * eccentricity;
+        ctx.translate(centerShift / 2, 0); 
+
+
+        // Draw saved sectors
+        savedSectors.forEach((sector, index) => {
+            const alpha = 1 - (savedSectors.length - 1 - index) * 0.15; // Fade out older ones
+            drawSector(sector, `rgba(56, 189, 248, ${Math.max(0.1, alpha * 0.4)})`);
+        });
+
+        // Draw current sweeping sector
+        if (isSweeping) {
+            // Close the shape temporarily to current point for drawing
+            const currentPoly = [...sweepPoints, {x: x, y: y}];
+            drawSector(currentPoly, 'rgba(56, 189, 248, 0.6)');
+        }
+
+        // Draw Orbit Path (Ellipse)
+        ctx.beginPath();
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
+        ctx.lineWidth = 1;
+        // Re-calculate full path for drawing
+        for (let th = 0; th <= Math.PI * 2; th += 0.05) {
+            const pathR = getRadius(th, eccentricity, semiMajorAxisPixels);
+            ctx.lineTo(pathR * Math.cos(th), pathR * Math.sin(th));
+        }
+        ctx.closePath();
+        ctx.stroke();
+
+        // Draw Sun (Focus) at (0,0)
+        ctx.beginPath();
+        ctx.fillStyle = '#fbbf24';
+        ctx.shadowBlur = 15;
+        ctx.shadowColor = '#fbbf24';
+        ctx.arc(0, 0, 8, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.shadowBlur = 0;
+
+        // Draw Planet
+        ctx.beginPath();
+        ctx.fillStyle = '#f472b6';
+        ctx.arc(x, y, 6, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Draw Radius Vector
+        ctx.beginPath();
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
+        ctx.setLineDash([2, 2]);
+        ctx.moveTo(0, 0);
+        ctx.lineTo(x, y);
+        ctx.stroke();
+        ctx.setLineDash([]);
+
+        ctx.restore();
+
+        requestAnimationFrame(loop);
+    }
+
+    function drawSector(points, color) {
+        if (points.length < 2) return;
+        ctx.beginPath();
+        ctx.fillStyle = color;
+        ctx.moveTo(points[0].x, points[0].y); // Should be focus
+        for (let i = 1; i < points.length; i++) {
+            ctx.lineTo(points[i].x, points[i].y);
+        }
+        ctx.lineTo(points[0].x, points[0].y); // Close loop
+        ctx.fill();
+        ctx.strokeStyle = 'rgba(255,255,255,0.1)';
+        ctx.stroke();
+    }
+
+    // Start
+    loop();
+
+</script>
+</body>
+</html>
