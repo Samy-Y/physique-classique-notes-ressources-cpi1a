@@ -1,0 +1,287 @@
+\document[class=report, fontsize=11pt, paper=a4, twoside=false]{scrartcl}
+\usepackage[utf8]{inputenc}
+
+\begin{document}
+
+\section{Mouvement d'une particule chargée dans un champ électrique
+et/ou magnétique uniforme et
+permanent}\label{mouvement-dune-particule-charguxe9e-dans-un-champ-uxe9lectrique-etou-magnuxe9tique-uniforme-et-permanent}
+
+\emph{Samy Youssoufine - Déc.-Jan.~2025}
+
+\emph{Notes personnelles}
+
+Il s'agit d'une nouvelle application du principe fondamental de la
+dynamique (PFD) à une particule chargée en mouvement dans un champ
+magnétique.
+
+Nous allons définir deux champs : - Le champ statique
+\(\overrightarrow{B}\) qui est \textbf{indépendant du temps}. On a donc
+\(\frac{\partial \overrightarrow{B}}{\partial t}=0\). - Le champ
+uniforme, c'est-à-dire que \(\overrightarrow{B}\) est constant en tout
+point de l'espace, donc \textbf{indépendant de la position}
+\(\overrightarrow{r}\).
+
+Il y a donc une différence d'indépendance (temporelle/spatiale).
+
+Nous allons maintenant étudier le mouvement d'une particule chargée dans
+le champ électrique.
+
+\subsection{Champ électrique statique et
+uniforme}\label{champ-uxe9lectrique-statique-et-uniforme}
+
+Pour créer un champ statique \(\vec{E}\), on utilise deux conducteurs
+parcourus par un courant électrique, par exemple deux plaques
+métalliques parallèles, auxquelles on va appliquer une différence de
+potentiel \(U\).
+
+On dit qu'il y a entre les deux plaques un \textbf{gradient de
+potentiel}.
+
+Le potentiel électrique va dépendre de la position \(x\) entre les deux
+plaques selon la relation :
+\[V(x) = \frac{V_+ - V_-}{d}x + V_+ = -Ex+V_+\] où \(d\) est la distance
+entre les deux plaques, \(V_+\) et \(V_-\) sont les potentiels
+respectifs des plaques, et \(E = \frac{V_+ - V_-}{d}=\frac Ud\) est
+l'intensité du champ électrique entre les plaques.
+
+L'énergie potentielle électrique d'une particule chargée \(q\) placée
+entre les deux plaques est donnée par :
+\[E_p(x) = qV(x) = q\left(-Ex + V_+\right) = -qEx + qV_+\]
+
+Le résultat ci-dessous peut-être utilisé comme une définition.
+
+Cela va créer un champ électrique \(\vec{E}\) entre les deux plaques, et
+si on place une particule chargée entre ces plaques, elle va être
+soumise à une force électrique \(\vec{F}_E = q\vec{E}\).
+
+\begin{itemize}
+\tightlist
+\item
+  C'est exactement analogue à la force gravitationnelle
+  \(\vec{P} = m\vec{g}\). Ces deux forces ont le même caractère
+  \textbf{conservatif}.
+\item
+  Si on abandonne une particule chargée \(q\) entre les deux plaques,
+  elle va évoluer vers un état où son potentiel électrique est minimal,
+  comme pour un objet lâché dans un champ de pesanteur.
+\end{itemize}
+
+En revanche, il faut noter que la charge \(q\) peut être négative. Dans
+ce cas, la force électrique \(\vec{F}_E\) sera dirigée dans le sens
+opposé au champ électrique \(\vec{E}\). C'est une différence importante
+avec la force de pesanteur, qui est toujours dirigée vers le bas.
+
+\subsection{Champ magnétique statique et
+uniforme}\label{champ-magnuxe9tique-statique-et-uniforme}
+
+Pour créer un champ magnétique statique et uniforme, on utilise une
+bobine parcourue par un courant électrique continu. Une caractéristique
+importante des bobines est que le champ magnétique produit va dépendre
+du nombre de spires par unité de longueur \(n\) et de l'intensité du
+courant \(I\) qui la traverse. On parle de \textbf{bobines de
+Helmholtz}.
+
+\subsection{Force de Lorentz}\label{force-de-lorentz}
+
+Lorsqu'une particule chargée \(q\) se déplace dans un champ magnétique
+\(\vec{B}\) et un champ électrique \(\vec{E}\), elle est soumise à une
+force appelée \textbf{force de Lorentz}. Cette force est donnée par la
+relation vectorielle suivante :
+
+\[\vec{F} = q\left(\vec{E} + \underbrace{\vec{v} \wedge \vec{B}}_{\text{antisymétrique}}\right)\]
+
+où \(\vec{v}\) est la vitesse de la particule.
+
+\textbf{Effet symétrique du champ \(\vec{E}\) :} La force électrique
+\(\vec{F}_E\) est dirigée dans le sens du champ électrique \(\vec{E}\).
+La trajectoire va évoluer pour être alignée avec le champ électrique.
+
+Trajectoire
+
+Trajectoire
+
+F\_e
+
+F\_e
+
+v\_0
+
+v\_0
+
+Text is not SVG - cannot display
+
+\textbf{Effet antisymétrique du champ \(\vec{B}\) :} La force magnétique
+\(\vec{F}_B\) est perpendiculaire à la fois à la vitesse \(\vec{v}\) de
+la particule et au champ magnétique \(\vec{B}\).
+
+{Note intéressante}
+
+\textbf{Il existe 4 interactions fondamentales dans la physique} 1.
+\textbf{Interaction gravitationnelle :} responsable de la force de
+gravitation entre les masses. 2. \textbf{Interaction électromagnétique
+:} responsable des forces entre les charges électriques et des
+phénomènes magnétiques. 3. \textbf{Interaction faible (électrofaible) :}
+responsable des processus de désintégration radioactive de type
+\(\beta\), soit l'émission d'un électron ou d'un positron par un noyau
+instable (\(N \to P + ne^+\) ou \(P\to N+ne^-\)). Quand un électron est
+émis d'un noyau, l'interaction forte ne permet pas cette émission. Leur
+ordre de grandeur est très faible, d'où l'appellation ``faible''. 4.
+\textbf{Interaction forte :} responsable de la cohésion des noyaux
+atomiques. Normalement, la répulsion entre protons devrait les faire
+exploser, mais l'interaction forte les maintient ensemble. Leur ordre de
+grandeur est très élevé, d'où l'appellation ``forte''.
+
+{Équation du mouvement}
+
+En appliquant le principe fondamental de la dynamique (PFD) à une
+particule chargée \(q\) de masse \(m\) se déplaçant dans un champ
+électrique \(\vec{E}\) et un champ magnétique \(\vec{B}\), on obtient
+l'équation du mouvement suivante :
+
+\[\frac{d\vec{v}}{dt} = \frac qm \left(\vec{E} + \vec{v} \wedge \vec{B}\right)\]
+
+Cette formule reste valide dans le cas de la mécanique classique, tant
+que les vitesses impliquées sont bien inférieures à la vitesse de la
+lumière \(c=3\cdot 10^8 \, \text{m/s}\).
+
+Seule \(\frac qm\), appelée \textbf{charge spécifique} ou \textbf{charge
+massique}, est expérimentalement mesurable.
+
+\textbf{Pour l'instant, nous allons nous limiter uniquement à l'étude
+d'un système qui subit un champ électrique \(\vec{E}\), sans champ
+magnétique \(\vec{B}\).}
+
+{Remarque}
+
+Nous n'allons étudier que le mouvement plan, donc quand \(\vec{v_0}\) et
+\(\vec{E}\) sont dans le même plan.
+
+Nous allons redéfinir rapidement le système étudié. Il s'agit d'une
+particule chargée \(q\) de masse \(m\), de vitesse initiale
+\(\vec{v_0}\).
+
+Comme le champ \(\vec{E}\) est indépendant du temps, on peut intégrer
+vectoriellement en prenant comme origine spatiale \(O\) le point où la
+particule est lâchée à l'instant \(t=0\). On va aussi définir le plan
+\((x,y)\) comme le plan dans lequel la particule évolue, qui contient le
+vecteur vitesse initial \(\vec{v_0}\) et le vecteur champ électrique
+\(\vec{E}\).
+
+On obtient ainsi la relation :
+
+\[\vec{v}(t) = \vec{v_0} + \frac qm \vec{E} t\]
+
+Cela implique donc que
+\(\vec{OM}(t)=\vec{v_0}t + \frac qm \frac{\vec{E} t^2}{2}\).
+
+En projectant cette relation dans l'espace \((x,y,z)\), on obtient les
+équations horaires suivantes :
+
+\[\begin{cases}
+x(t) = v_0\cos\alpha t + \frac qm \frac{E_x t^2}{2} \\
+y(t) = v_0\sin\alpha t + \underbrace{\frac qm \frac{E_y t^2}{2}}_{=0} \\
+z(t) = 0 \\
+\end{cases}
+\]
+
+(On a pris \(\vec{E} = E\vec{u_x}\), donc \(E_y = 0\))
+
+{Remarque}
+
+Attention, ces équations horaires ne sont valables que lorsqu'on prend
+l'origine spatiale \(O\) au point où la particule est lâchée à l'instant
+\(t=0\). Il faut ajouter \(x_0\) et \(y_0\) si l'origine spatiale est
+différente.
+
+Nous allons maintenant étudier le mouvement de cette particule,
+globalement.
+
+\textbf{Le cas où \(v_{0y} = 0\) est trivial.}
+
+En résumé, la particule va suivre une trajectoire rectiligne, accélérée
+dans la direction du champ électrique \(\vec{E}\). Elle va d'abord se
+diriger vers la direction du vecteur vitesse initial \(\vec{v_0}\), puis
+va être déviée par le champ électrique \(\vec{E}\), et enfin va se
+diriger dans la direction de ce champ électrique.
+
+\textbf{Étude du cas général où \(v_{0y} \neq 0\)}
+
+La vitesse initiale \(\vec{v_0}\) fait un angle \(\alpha\) avec le champ
+électrique \(\vec{E}\). Elle n'est donc pas parallèle à ce champ.
+
+On peut écrire l'équation de la trajectoire \(x(y)\) en éliminant le
+paramètre temps \(t\).
+
+On trouve ainsi :
+
+\[x(y)=\frac{qE}{2mv_0^2\cos\alpha}y^2 + y\cot(\alpha)\]
+
+La trajectoire suivie ici est une parabole (déviation parabolique).
+
+Si on fixe quelques paramètres initiaux, on peut observer l'effet de la
+position initiale sur la trajectoire de la particule chargée. En effet,
+celle-ci restera la même, mais décalée en fonction de la position
+initiale. Elle sera donc translatée.
+
+\subsection{Aspects énergétiques}\label{aspects-uxe9nerguxe9tiques}
+
+Le potentiel électrique \(V\) dans un champ électrique uniforme
+\(\vec{E}\) varie linéairement avec la position \(x\) selon la relation
+:
+
+\[V(x) = -Ex + \text{constante}\]
+
+L'énergie potentielle d'une charge \(q\) dans un champ électrostatique
+\(\vec{E}\) est donnée par la relation :
+
+\[E_p(x) = -qV\\\implies \boxed{E_p(x)=-qEx + \text{constante}}\]
+
+(comme vu précédemment)
+
+La force électrique \(\vec{F}_E = q\vec{E}\) est conservative, donc le
+travail de cette force entre deux points \(A\) et \(B\) est égal à la
+variation de l'énergie potentielle électrique entre ces deux points :
+
+\[W_{A\to B}(\vec{F}_E) = E_p(A) - E_p(B)\]
+
+{Démonstration}
+
+\[\vec{f}=q\vec{E}=qE\vec{u_x}\]
+
+\[\delta W(\vec{f}) = \vec{f} \cdot d\vec{OM}=qE\cdot dx\]
+
+\[\delta W(\vec{f}) = -dE_p\]
+
+\[\dots \text{CQFD.}\]
+
+On peut aussi appliquer le théorème de l'énergie cinétique (TEC) entre
+deux points \(A\) et \(B\) :
+
+\[\Delta E_c = W_{A\to B}(\vec{F}_E) \\\implies E_c(B) - E_c(A) = qE(x_B-x_A)\]
+
+\textbf{Attention : Il faut faire attention au signe de la tension et de
+la charge pour bien définir les positions etc. etc. etc.} Si la
+particule étudiée a une charge négative, elle va se diriger dans le
+``sens croissant du potentiel électrique'', soit la plaque positive.
+Dans le cas contraire, elle va se diriger dans le ``sens décroissant du
+potentiel électrique'', soit la plaque négative.
+
+On peut développer l'expression du théorème de l'énergie cinétique (TEC)
+pour obtenir :
+
+\[\Delta E_c = qE(x(t_2)-x(t_1))\]
+
+\[\implies \Delta E_c=qE\left(v_0\cos\alpha (t_2 - t_1) + \frac qm \frac{E(t_2^2 - t_1^2)}{2}\right)\]
+
+\[\implies \boxed{\Delta E_c = \frac{q^2 E^2}{m} \frac{(t_2^2 - t_1^2)}{2} + qE v_0\cos\alpha (t_2 - t_1)}\]
+
+On étudie ensuite le signe de \(\Delta E_c\) pour déterminer si la
+particule accélère ou décélère.
+
+\textbf{Applications : accélérateurs linéaires}
+
+\subsection{\texorpdfstring{Champ magnétique
+\(\vec{B}\)}{Champ magnétique \textbackslash vec\{B\}}}\label{champ-magnuxe9tique-vecb}
+
+\end{document}

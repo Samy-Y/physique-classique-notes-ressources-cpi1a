@@ -1,0 +1,1693 @@
+<html><head>
+
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1"><meta name="author" content="Created with Hot Potatoes by Half-Baked Software, registered to claude raclot."><meta name="keywords" content="Hot Potatoes, Half-Baked Software, Windows, University of Victoria">
+<title>
+structure de l'atome
+</title>
+
+<script language="javascript" type="text/javascript">
+
+//<![CDATA[
+
+<!--
+
+// BrowserCheck Object
+
+function BrowserCheck() {
+	var b = navigator.appName
+//HBS extension
+	this.mac = (navigator.appVersion.indexOf('Mac') != -1)
+	if (b=="Netscape") this.b = "ns"
+	else if (b=="Microsoft Internet Explorer") this.b = "ie"
+	else this.b = b
+	this.version = navigator.appVersion
+	this.v = parseInt(this.version)
+	this.ns = (this.b=="ns" && this.v>=4)
+	this.ns4 = (this.b=="ns" && this.v==4)
+	this.ns5 = (this.b=="ns" && this.v==5)
+	this.ie = (this.b=="ie" && this.v>=4)
+	this.ie4 = (this.version.indexOf('MSIE 4')>0)
+	this.ie5 = (this.version.indexOf('MSIE 5')>0)
+	this.min = (this.ns||this.ie)
+	this.CRAPBrowser = (this.ie && this.mac); //Cannot Resolve Addresses Properly
+}
+
+is = new BrowserCheck();
+
+var LocFolder = GetFolder(window.location.href);
+function GetFolder(LocPath){
+	LocPath = ReplaceStuff('\'','%27',LocPath);
+	var i = LocPath.lastIndexOf('/');
+	if (i<0){i=LocPath.lastIndexOf('\\')};
+	return LocPath.substring(0,i);
+}
+
+function CombineURLs(InURL){
+	var i = InURL.indexOf('../');
+	var s = LocFolder;
+	while (i >- 1){
+		s = GetFolder(s);
+		InURL = InURL.substring(3,InURL.length);
+		i = InURL.indexOf('../');
+	}
+	return s + '/' + InURL;
+}
+
+x = new Array();
+function ResolveURLs(InText,Attribute){
+	x.length=0;
+	var Temp = InText.toLowerCase();
+	var z;
+	var AttLen = Attribute.length + 2;
+	var y=Temp.lastIndexOf(Attribute + '="');
+	while (y>-1){
+		var sLoc = y+AttLen;
+		if (Temp.substring(sLoc,sLoc+5) != 'http:'){
+			x[x.length]=new Array();
+			x[x.length-1][0] = sLoc;
+			z = Temp.indexOf('"',sLoc);
+			x[x.length-1][1] = z;
+			x[x.length-1][2] = Temp.substring(sLoc,z);
+		}
+		Temp = Temp.substring(0,y);
+		y=Temp.lastIndexOf(Attribute + '="');
+	}
+	for (var j=0; j<x.length; j++){
+		InText = InText.substring(0,x[j][0]) + CombineURLs(x[j][2]) + InText.substring(x[j][1], InText.length);
+	}
+	return InText;
+}
+
+function ResolveAllURLs(Stuff){
+	Stuff = ResolveURLs(Stuff,'href');
+	Stuff = ResolveURLs(Stuff,'src');
+	Stuff = ResolveURLs(Stuff,'parent.location');
+	return Stuff;
+}
+
+
+var ExBGColor = '#FFFFFF';
+
+
+
+var PageBGColor = '#FFFFFF';
+
+
+
+var NavBarColor = '#FFFFFF';
+
+
+var TextColor = '#000066';
+var CurrQNum = 0;
+var ALetters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+var CorrectIndicator = 'bon';
+var IncorrectIndicator = 'X';
+var YourScoreIs = '';
+var Tries = 0;
+var CorrectChoices = 0;
+var ContinuousScoring = false;
+var CorrectFirstTime = '';var ExerciseTitle = 'structure de l\'atome';
+var ExerciseSubtitle = 'auteur : <a href="javascript:history.back()  "  >auteur :Aurélie</a> 10/2002';
+var Instructions = 'Choisissez la (les)  bonne(s)  réponse(s) pour chaque question'; //'';
+var ShuffleQs = true;
+var ShuffleAs = true;
+var DefaultRight = 'Correct!';
+var DefaultWrong = 'Erreur, essayez à nouveau';
+var QsToShow = 50;
+var ShowOneByOne = true;
+var ReadingURL = '';
+var EraseFeedback = true;
+var Score = 0;
+
+var PreviousPage = history.length;
+
+
+
+
+
+
+
+var NavBar='';
+
+
+NavBar+='<tr><form name="NavButtons1" action=""><td bgcolor="#FFFFFF" align="center">';
+NavBar+='<font face="Geneva,Arial" size="-1">';
+
+
+NavBar+='<input type="button" value="sommaire" onclick=\'parent.location="../index2.htm  "\'></input>';
+
+
+NavBar+='</font></td></form></tr>';
+if (is.CRAPBrowser){NavBar=ResolveAllURLs(NavBar)};
+
+
+var TitleCode = '<tr><td align="center" valign="middle" bgcolor="#FFFFFF">';
+TitleCode += '<font size="+1" face="Geneva,Arial" color="#000000 ">' + ExerciseTitle + '</font><br />';
+TitleCode += '<font size="-1" face="Geneva,Arial" color="#000000 ">' + ExerciseSubtitle + '<br />';
+TitleCode += '</font></td></tr>';
+
+var QButtonsOpener = '<table border="0" width="85%" cellpadding="10">';
+QButtonsOpener += '<tr><td align="center" valign="middle"><form>';
+QButtonsOpener += '<font size="+1"><input type="button" value="&lt;=" onclick="parent.ChangeQ(-1)"></input>';
+var QButtonsCloser = '<input type="button" value="=&gt;" onclick="parent.ChangeQ(1)"></input>';
+QButtonsCloser += '</font></form></td></tr></table>';
+
+var TableOpener = '<form name="QForm">';
+TableOpener += '<table border="0" width="85%">';
+var QRow = '<tr><td valign="top" bgcolor="#FFFFFF" align="right">';
+QRow += '<font size="+1" face="Geneva,Arial" color="#000066">[QNumber]</font></td>';
+QRow += '<td colspan="3" valign="top" bgcolor="#FFFFFF"><font size="-1" face="Geneva,Arial" color="#000066">[Question]<br />&nbsp;';
+QRow += '</font></td></tr>';
+
+var ARow = '<tr><td></td><td valign="top" bgcolor="#FFFFFF"><input type="text" value=" " size="3" name="FB_[QNum]_[ANum]"></input></td>';
+ARow += '<td valign="top" bgcolor="#FFFFFF"><input type="button" value="[ALetter]" OnClick="parent.CheckAnswer([QNum],[ANum])"></input></td>';
+ARow += '<td width="100%" bgcolor="#FFFFFF"><font size="-1" face="Geneva,Arial" color="#000066">[Ans]</font></td></tr>';
+
+var MARow = '<tr><td></td><td valign="top" bgcolor="#FFFFFF" colspan="3"><input type="checkbox" name="A_[QNum]_[ANum]" value="[Correct]"></input>';
+MARow += '<font size="-1" face="Geneva,Arial" color="#000066">[Ans]</font></td></tr>';
+
+var CheckButton = '<tr><td></td><td valign="top" bgcolor="#FFFFFF" ><input type="button" value="Vérifier"';
+CheckButton += ' onclick="parent.CheckMulti([QNum])"></input></td></tr>';
+
+TableCloser = '</table></form>';
+
+function GoBack(){
+	var BackSkip = history.length - PreviousPage;
+	if (BackSkip > 0){
+		history.go((BackSkip+1)*-1);
+	}
+	else{
+		parent.history.back();
+	}
+}
+
+function ReduceItems(){
+	var ItemToDump=0;
+	var j=0;
+	while (I.length > QsToShow){
+		ItemToDump = Math.floor(I.length*Math.random());
+		for (j=ItemToDump; j<(I.length-1); j++){
+			I[j] = I[j+1];
+		}
+		I.length = I.length-1;
+	}
+}
+
+function Shuffle(InArray){
+	Temp = new Array();
+	var Len = InArray.length;
+
+	var j = Len;
+
+	for (var i=0; i<Len; i++){
+		Temp[i] = InArray[i];
+	}
+
+	for (i=0; i<Len; i++){
+		Num = Math.floor(j  *  Math.random());
+		InArray[i] = Temp[Num];
+
+		for (var k=Num; k < j; k++) {
+			Temp[k] = Temp[k+1];
+		}
+		j--;
+	}
+	return InArray;
+}
+
+function WriteFeedback(Feedback) {
+	if (is.CRAPBrowser){Feedback=ResolveAllURLs(Feedback);}
+//Build the output string
+	var OutString = '';
+	OutString += '<html>';
+	OutString += '<body  background="graphique.gif" bgcolor="#FFFFFF" text="#000066" link="#0000ff" vlink="#0000cc">';
+	OutString += '<center><table border="0" cellpadding="5" cellspacing="1" width="85%">';
+	OutString += NavBar;
+	if (Feedback.length>0){
+		OutString += '<tr><td bgcolor="#FFFFFF" align="center">'; 
+		OutString += '<font face="Geneva,Arial" size="-1" color="#000066">';
+		OutString += Feedback;
+		OutString += '</font></td></tr>'
+	}
+	OutString += '</table></center></body></html>';
+//Write it to the frame
+	TopFrame.document.clear();
+	TopFrame.document.open();
+	TopFrame.document.write(OutString);
+	TopFrame.document.close();
+}
+
+function StartUp(){
+
+
+
+
+//Reduce array if required
+	if (QsToShow < I.length){
+		ReduceItems();
+	}
+
+//Shuffle stuff if required
+
+	if (ShuffleQs == true){
+		I = Shuffle(I);
+	}
+
+	if (ShuffleAs == true){
+		for (var i=0; i<I.length; i++){
+			I[i][1] = Shuffle(I[i][1]);
+		}
+	}
+
+//Create arrays
+	CreateStatusArrays();
+
+
+
+//Show the first question or all of them
+	if (ShowOneByOne == false){
+		ShowAllQs();
+	}
+	else{
+		ShowQuestion(CurrQNum);
+	}
+
+//Write the top frame
+	WriteFeedback(Instructions);
+}
+
+
+I = new Array();
+
+I[0] = new Array();
+I[0][0]='Combien y a-t-il d\'électrons dans la deuxième couche électronique d\'un atome de calcium dans l\'état  fondamental ? (Z=20)';
+I[0][1] = new Array();
+I[0][1][0] = new Array();
+I[0][1][0][0]='2';
+I[0][1][0][1]='la seconde couche compte au plus 8 électrons<br />il y a 20 électrons à placer dont 2 sur la première couche';
+I[0][1][0][2] = 0;
+I[0][1][1] = new Array();
+I[0][1][1][0]='18';
+I[0][1][1][1]='la seconde couche compte au plus 8 électrons<br />il y a 20 électrons à placer dont 2 sur la première couche';
+I[0][1][1][2] = 0;
+I[0][1][2] = new Array();
+I[0][1][2][0]='8';
+I[0][1][2][1]='';
+I[0][1][2][2] = 1;
+I[0][1][3] = new Array();
+I[0][1][3][0]='6';
+I[0][1][3][1]='la seconde couche compte au plus 8 électrons<br />il y a 20 électrons à placer dont 2 sur la première couche';
+I[0][1][3][2] = 0;
+I[0][2] = 0;
+
+I[1] = new Array();
+I[1][0]='Les atomes de quel élément, au niveau  fondamental, possède des électrons ayant le nombre quantique n = 4 ?<br />';
+I[1][1] = new Array();
+I[1][1][0] = new Array();
+I[1][1][0][0]='He (Z=2)';
+I[1][1][0][1]='';
+I[1][1][0][2] = 0;
+I[1][1][1] = new Array();
+I[1][1][1][0]='Kr (Z= 36)';
+I[1][1][1][1]='';
+I[1][1][1][2] = 1;
+I[1][1][2] = new Array();
+I[1][1][2][0]='Ar (Z= 18)';
+I[1][1][2][1]='';
+I[1][1][2][2] = 0;
+I[1][1][3] = new Array();
+I[1][1][3][0]='Ne ( Z=10)';
+I[1][1][3][1]='';
+I[1][1][3][2] = 0;
+I[1][2] = 0;
+
+I[2] = new Array();
+I[2][0]='Combien de sous-couches électroniques sont complètes dans la deuxième couche d\'un atome de sodium à l\'état  fondamental ?( Z=11)';
+I[2][1] = new Array();
+I[2][1][0] = new Array();
+I[2][1][0][0]='1';
+I[2][1][0][1]='';
+I[2][1][0][2] = 0;
+I[2][1][1] = new Array();
+I[2][1][1][0]='2';
+I[2][1][1][1]='';
+I[2][1][1][2] = 1;
+I[2][1][2] = new Array();
+I[2][1][2][0]='3';
+I[2][1][2][1]='';
+I[2][1][2][2] = 0;
+I[2][1][3] = new Array();
+I[2][1][3][0]='4';
+I[2][1][3][1]='';
+I[2][1][3][2] = 0;
+I[2][2] = 0;
+
+I[3] = new Array();
+I[3][0]='Quelle configuration électronique représente un atome d\'azote dans un état excité ? (Z=7)<br /><center><img src="../Images/nov02/atome1.gif" alt="atome1.gif" width="296" height="43" border="0"></img></center>';
+I[3][1] = new Array();
+I[3][1][0] = new Array();
+I[3][1][0][0]='proposition a';
+I[3][1][0][1]='';
+I[3][1][0][2] = 1;
+I[3][1][1] = new Array();
+I[3][1][1][0]='proposition b';
+I[3][1][1][1]='il y a un électron de trop';
+I[3][1][1][2] = 0;
+I[3][1][2] = new Array();
+I[3][1][2][0]='proposition c';
+I[3][1][2][1]='il manque un électron';
+I[3][1][2][2] = 0;
+I[3][1][3] = new Array();
+I[3][1][3][0]='proposition d';
+I[3][1][3][1]='il y a un électron de trop';
+I[3][1][3][2] = 0;
+I[3][2] = 0;
+
+I[4] = new Array();
+I[4][0]='Combien de sous-couches sont occupées dans un atome de carbone au niveau  fondamental ? (Z=6)<br />';
+I[4][1] = new Array();
+I[4][1][0] = new Array();
+I[4][1][0][0]='6';
+I[4][1][0][1]='';
+I[4][1][0][2] = 0;
+I[4][1][1] = new Array();
+I[4][1][1][0]='5';
+I[4][1][1][1]='';
+I[4][1][1][2] = 0;
+I[4][1][2] = new Array();
+I[4][1][2][0]='3';
+I[4][1][2][1]='';
+I[4][1][2][2] = 1;
+I[4][1][3] = new Array();
+I[4][1][3][0]='4';
+I[4][1][3][1]='';
+I[4][1][3][2] = 0;
+I[4][2] = 0;
+
+I[5] = new Array();
+I[5][0]='Combien d\'orbitales sont complétement pleines dans un atome d\'azote au niveau fondamental ( Z=7)<br /><center><img src="../Images/nov02/atome10.gif" alt="atome10.gif" width="184" height="73" border="0"></img></center>';
+I[5][1] = new Array();
+I[5][1][0] = new Array();
+I[5][1][0][0]='5';
+I[5][1][0][1]='';
+I[5][1][0][2] = 0;
+I[5][1][1] = new Array();
+I[5][1][1][0]='2';
+I[5][1][1][1]='';
+I[5][1][1][2] = 1;
+I[5][1][2] = new Array();
+I[5][1][2][0]='3';
+I[5][1][2][1]='';
+I[5][1][2][2] = 0;
+I[5][1][3] = new Array();
+I[5][1][3][0]='4';
+I[5][1][3][1]='';
+I[5][1][3][2] = 0;
+I[5][2] = 0;
+
+I[6] = new Array();
+I[6][0]='A quelle transition correspond le transfert d\'énergie le plus élevé ?';
+I[6][1] = new Array();
+I[6][1][0] = new Array();
+I[6][1][0][0]='2p à 3s';
+I[6][1][0][1]='';
+I[6][1][0][2] = 0;
+I[6][1][1] = new Array();
+I[6][1][1][0]='3s à 3p';
+I[6][1][1][1]='';
+I[6][1][1][2] = 0;
+I[6][1][2] = new Array();
+I[6][1][2][0]='1s à 3p';
+I[6][1][2][1]='';
+I[6][1][2][2] = 1;
+I[6][1][3] = new Array();
+I[6][1][3][0]='3s à 4s';
+I[6][1][3][1]='';
+I[6][1][3][2] = 0;
+I[6][2] = 0;
+
+I[7] = new Array();
+I[7][0]='De quelle(s) sous-couche ou sous-couches sont arrachés les électrons lorsqu\'un atome de fer devient chargé avec une charge de +3 ? ( Z=26)<br /><center><img src="../Images/nov02/atome11.gif" alt="atome11.gif" width="286" height="137" border="0"></img></center><br />';
+I[7][1] = new Array();
+I[7][1][0] = new Array();
+I[7][1][0][0]='3s et 4d';
+I[7][1][0][1]='';
+I[7][1][0][2] = 0;
+I[7][1][1] = new Array();
+I[7][1][1][0]='3d et 4s';
+I[7][1][1][1]='';
+I[7][1][1][2] = 1;
+I[7][1][2] = new Array();
+I[7][1][2][0]='4d seulement';
+I[7][1][2][1]='';
+I[7][1][2][2] = 0;
+I[7][1][3] = new Array();
+I[7][1][3][0]='3p seulement';
+I[7][1][3][1]='';
+I[7][1][3][2] = 0;
+I[7][2] = 0;
+
+I[8] = new Array();
+I[8][0]='Quelle proposition représente la configuration électronique d\'un isotope d\'oxygène au niveau fondamental ? (Z=8)<br /><center><img src="../Images/nov02/atome12.gif" alt="atome12.gif" width="288" height="48" border="0"></img></center>';
+I[8][1] = new Array();
+I[8][1][0] = new Array();
+I[8][1][0][0]='proposition a';
+I[8][1][0][1]='il manque des électrons';
+I[8][1][0][2] = 0;
+I[8][1][1] = new Array();
+I[8][1][1][0]='proposition b';
+I[8][1][1][1]='il manque des électrons';
+I[8][1][1][2] = 0;
+I[8][1][2] = new Array();
+I[8][1][2][0]='proposition c';
+I[8][1][2][1]='';
+I[8][1][2][2] = 1;
+I[8][1][3] = new Array();
+I[8][1][3][0]='proposition d';
+I[8][1][3][1]='il manque des électrons';
+I[8][1][3][2] = 0;
+I[8][2] = 0;
+
+I[9] = new Array();
+I[9][0]='Laquelle des sous-couches suivantes possède le niveau d\'énergie le plus faible ?<br />';
+I[9][1] = new Array();
+I[9][1][0] = new Array();
+I[9][1][0][0]='4s';
+I[9][1][0][1]='';
+I[9][1][0][2] = 1;
+I[9][1][1] = new Array();
+I[9][1][1][0]='4p';
+I[9][1][1][1]='n+ l  = 4+2 doit être le plus petit possible';
+I[9][1][1][2] = 0;
+I[9][1][2] = new Array();
+I[9][1][2][0]='4f';
+I[9][1][2][1]='n+ l  = 4+4 doit être le plus petit possible';
+I[9][1][2][2] = 0;
+I[9][1][3] = new Array();
+I[9][1][3][0]='4d';
+I[9][1][3][1]='n+ l  = 4+3 doit être le plus petit possible';
+I[9][1][3][2] = 0;
+I[9][2] = 0;
+
+I[10] = new Array();
+I[10][0]='Quelle particule a une masse approximative de 1 uma et une charge positive ?<br />';
+I[10][1] = new Array();
+I[10][1][0] = new Array();
+I[10][1][0][0]='neutron';
+I[10][1][0][1]='';
+I[10][1][0][2] = 0;
+I[10][1][1] = new Array();
+I[10][1][1][0]='proton';
+I[10][1][1][1]='';
+I[10][1][1][2] = 1;
+I[10][1][2] = new Array();
+I[10][1][2][0]='particule alpha';
+I[10][1][2][1]='';
+I[10][1][2][2] = 0;
+I[10][1][3] = new Array();
+I[10][1][3][0]='électron';
+I[10][1][3][1]='';
+I[10][1][3][2] = 0;
+I[10][2] = 0;
+
+I[11] = new Array();
+I[11][0]='Quel est le nombre maximum d\'électrons pouvant être logés dans la sous-couche 4d ?<br />';
+I[11][1] = new Array();
+I[11][1][0] = new Array();
+I[11][1][0][0]='14';
+I[11][1][0][1]='';
+I[11][1][0][2] = 0;
+I[11][1][1] = new Array();
+I[11][1][1][0]='6';
+I[11][1][1][1]='';
+I[11][1][1][2] = 0;
+I[11][1][2] = new Array();
+I[11][1][2][0]='2';
+I[11][1][2][1]='';
+I[11][1][2][2] = 0;
+I[11][1][3] = new Array();
+I[11][1][3][0]='10';
+I[11][1][3][1]='';
+I[11][1][3][2] = 1;
+I[11][2] = 0;
+
+I[12] = new Array();
+I[12][0]='Quelles sous-couches sont occupées dans la dernière couche électronique d\'un atome d\'argon à l\'état  fondamental ? (Z=18)';
+I[12][1] = new Array();
+I[12][1][0] = new Array();
+I[12][1][0][0]='3s et 3p';
+I[12][1][0][1]='';
+I[12][1][0][2] = 1;
+I[12][1][1] = new Array();
+I[12][1][1][0]='2p et 3d';
+I[12][1][1][1]='';
+I[12][1][1][2] = 0;
+I[12][1][2] = new Array();
+I[12][1][2][0]='3s et 3d';
+I[12][1][2][1]='';
+I[12][1][2][2] = 0;
+I[12][1][3] = new Array();
+I[12][1][3][0]='2s et 3p';
+I[12][1][3][1]='';
+I[12][1][3][2] = 0;
+I[12][2] = 0;
+
+I[13] = new Array();
+I[13][0]='Quelle configuration électronique représente un atome dans un état excité ?<br /><center><img src="../Images/nov02/atome13.gif" alt="atome13.gif" width="265" height="50" border="0"></img></center>';
+I[13][1] = new Array();
+I[13][1][0] = new Array();
+I[13][1][0][0]='proposition a';
+I[13][1][0][1]='';
+I[13][1][0][2] = 0;
+I[13][1][1] = new Array();
+I[13][1][1][0]='proposition b';
+I[13][1][1][1]='';
+I[13][1][1][2] = 0;
+I[13][1][2] = new Array();
+I[13][1][2][0]='proposition c';
+I[13][1][2][1]='';
+I[13][1][2][2] = 1;
+I[13][1][3] = new Array();
+I[13][1][3][0]='proposition d';
+I[13][1][3][1]='';
+I[13][1][3][2] = 0;
+I[13][2] = 0;
+
+I[14] = new Array();
+I[14][0]='Quel niveau d\'énergie est utilisé, une fois que la sous-couche 4s est pleine ?';
+I[14][1] = new Array();
+I[14][1][0] = new Array();
+I[14][1][0][0]='5s';
+I[14][1][0][1]='';
+I[14][1][0][2] = 0;
+I[14][1][1] = new Array();
+I[14][1][1][0]='3d';
+I[14][1][1][1]='';
+I[14][1][1][2] = 1;
+I[14][1][2] = new Array();
+I[14][1][2][0]='4p';
+I[14][1][2][1]='';
+I[14][1][2][2] = 0;
+I[14][1][3] = new Array();
+I[14][1][3][0]='4d';
+I[14][1][3][1]='';
+I[14][1][3][2] = 0;
+I[14][2] = 0;
+
+I[15] = new Array();
+I[15][0]='Quand le noyau d\'un élément radioactif émet des particules alpha ( noyau d\'hélium comptant deux protons positifs et plusieurs neutrons)';
+I[15][1] = new Array();
+I[15][1][0] = new Array();
+I[15][1][0][0]='la masse du noyau augmente';
+I[15][1][0][1]='';
+I[15][1][0][2] = 0;
+I[15][1][1] = new Array();
+I[15][1][1][0]='la charge du noyau augmente';
+I[15][1][1][1]='';
+I[15][1][1][2] = 0;
+I[15][1][2] = new Array();
+I[15][1][2][0]='le nombre d\'électrons diminue';
+I[15][1][2][1]='';
+I[15][1][2][2] = 0;
+I[15][1][3] = new Array();
+I[15][1][3][0]='la charge du noyau diminue';
+I[15][1][3][1]='';
+I[15][1][3][2] = 1;
+I[15][2] = 0;
+
+I[16] = new Array();
+I[16][0]='Quel est le nombre maximum d\'électrons pouvant occuper  la troisième couche électronique  ( n=3) ?<br />';
+I[16][1] = new Array();
+I[16][1][0] = new Array();
+I[16][1][0][0]='10';
+I[16][1][0][1]=' 2 n² = 2*9';
+I[16][1][0][2] = 0;
+I[16][1][1] = new Array();
+I[16][1][1][0]='32';
+I[16][1][1][1]=' 2 n² = 2*9';
+I[16][1][1][2] = 0;
+I[16][1][2] = new Array();
+I[16][1][2][0]='18';
+I[16][1][2][1]='';
+I[16][1][2][2] = 1;
+I[16][1][3] = new Array();
+I[16][1][3][0]='8';
+I[16][1][3][1]=' 2 n² = 2*9';
+I[16][1][3][2] = 0;
+I[16][2] = 0;
+
+I[17] = new Array();
+I[17][0]='L\'élément avec le numéro atomique 10 est isoélectronique (même nombre d\'électrons)  avec : Ne (Z=10) ';
+I[17][1] = new Array();
+I[17][1][0] = new Array();
+I[17][1][0][0]='l\'ion sodium Na+<br />';
+I[17][1][0][1]='';
+I[17][1][0][2] = 1;
+I[17][1][1] = new Array();
+I[17][1][1][0]='l\'atome de sodium Na (Z= 11)';
+I[17][1][1][1]='';
+I[17][1][1][2] = 0;
+I[17][1][2] = new Array();
+I[17][1][2][0]='l\'atome de chlore  Cl ( Z=17)';
+I[17][1][2][1]='';
+I[17][1][2][2] = 0;
+I[17][1][3] = new Array();
+I[17][1][3][0]='l\'ion chlorure Cl-';
+I[17][1][3][1]='';
+I[17][1][3][2] = 0;
+I[17][2] = 0;
+
+I[18] = new Array();
+I[18][0]='Quel atome, à son niveau fondamental, contient trois électrons non-appariés dans sa couche de valence ?';
+I[18][1] = new Array();
+I[18][1][0] = new Array();
+I[18][1][0][0]='N (Z=7)';
+I[18][1][0][1]='';
+I[18][1][0][2] = 1;
+I[18][1][1] = new Array();
+I[18][1][1][0]='Li (Z=3)';
+I[18][1][1][1]='';
+I[18][1][1][2] = 0;
+I[18][1][2] = new Array();
+I[18][1][2][0]='Be (Z=4)';
+I[18][1][2][1]='';
+I[18][1][2][2] = 0;
+I[18][1][3] = new Array();
+I[18][1][3][0]='Ne (Z=10)';
+I[18][1][3][1]='';
+I[18][1][3][2] = 0;
+I[18][2] = 0;
+
+I[19] = new Array();
+I[19][0]='Quel est le nombre maximum d\'électrons pouvant être logés dans la sous-couche 4d ?<br />';
+I[19][1] = new Array();
+I[19][1][0] = new Array();
+I[19][1][0][0]='6';
+I[19][1][0][1]='';
+I[19][1][0][2] = 0;
+I[19][1][1] = new Array();
+I[19][1][1][0]='2';
+I[19][1][1][1]='';
+I[19][1][1][2] = 0;
+I[19][1][2] = new Array();
+I[19][1][2][0]='10';
+I[19][1][2][1]='';
+I[19][1][2][2] = 1;
+I[19][1][3] = new Array();
+I[19][1][3][0]='14';
+I[19][1][3][1]='';
+I[19][1][3][2] = 0;
+I[19][2] = 0;
+
+I[20] = new Array();
+I[20][0]='Quel est le nombre maximum de sous-couches dans la troisième couche électronique  ( n=3) ?<br />';
+I[20][1] = new Array();
+I[20][1][0] = new Array();
+I[20][1][0][0]='3';
+I[20][1][0][1]='';
+I[20][1][0][2] = 1;
+I[20][1][1] = new Array();
+I[20][1][1][0]='4';
+I[20][1][1][1]='';
+I[20][1][1][2] = 0;
+I[20][1][2] = new Array();
+I[20][1][2][0]='2';
+I[20][1][2][1]='';
+I[20][1][2][2] = 0;
+I[20][1][3] = new Array();
+I[20][1][3][0]='1';
+I[20][1][3][1]='';
+I[20][1][3][2] = 0;
+I[20][2] = 0;
+
+I[21] = new Array();
+I[21][0]='Quelles " particules" possèdent la même configuration électronique ?<br />Cl ( Z=17) ; Ne (Z=10) ; K= 19 ; S (Z=16); F(Z=9)';
+I[21][1] = new Array();
+I[21][1][0] = new Array();
+I[21][1][0][0]='ion chlorure Cl- et atome de néon ';
+I[21][1][0][1]='';
+I[21][1][0][2] = 0;
+I[21][1][1] = new Array();
+I[21][1][1][0]='ion chlorure Cl- et atome de potassium K ';
+I[21][1][1][1]='';
+I[21][1][1][2] = 0;
+I[21][1][2] = new Array();
+I[21][1][2][0]='ion chlorure Cl- et ion sulfure S(2-)';
+I[21][1][2][1]='';
+I[21][1][2][2] = 1;
+I[21][1][3] = new Array();
+I[21][1][3][0]='ion chlorure Cl- et ion fluorure F-';
+I[21][1][3][1]='';
+I[21][1][3][2] = 0;
+I[21][2] = 0;
+
+I[22] = new Array();
+I[22][0]='Combien y a-t-il d\'orbitales, contenant un électron non-apparié dans un atome d\'aluminium au niveau  fondamental ? Al (Z=13)';
+I[22][1] = new Array();
+I[22][1][0] = new Array();
+I[22][1][0][0]='13';
+I[22][1][0][1]='';
+I[22][1][0][2] = 0;
+I[22][1][1] = new Array();
+I[22][1][1][0]='1';
+I[22][1][1][1]='';
+I[22][1][1][2] = 1;
+I[22][1][2] = new Array();
+I[22][1][2][0]='2';
+I[22][1][2][1]='';
+I[22][1][2][2] = 0;
+I[22][1][3] = new Array();
+I[22][1][3][0]='3';
+I[22][1][3][1]='';
+I[22][1][3][2] = 0;
+I[22][2] = 0;
+
+I[23] = new Array();
+I[23][0]='Quelles sous-couches sont occupées dans la dernière couche électronique d\'un atome d\'argon à l\'état  fondamental ? Ar (Z= 18)';
+I[23][1] = new Array();
+I[23][1][0] = new Array();
+I[23][1][0][0]='2s et 3p';
+I[23][1][0][1]='';
+I[23][1][0][2] = 0;
+I[23][1][1] = new Array();
+I[23][1][1][0]='3s et 3d';
+I[23][1][1][1]='';
+I[23][1][1][2] = 0;
+I[23][1][2] = new Array();
+I[23][1][2][0]='3s et 3p';
+I[23][1][2][1]='';
+I[23][1][2][2] = 1;
+I[23][1][3] = new Array();
+I[23][1][3][0]='2p et 3d';
+I[23][1][3][1]='';
+I[23][1][3][2] = 0;
+I[23][2] = 0;
+
+I[24] = new Array();
+I[24][0]='Quelle couche électronique peut contenir un maximum de 18 électrons ? ( 2 n² )';
+I[24][1] = new Array();
+I[24][1][0] = new Array();
+I[24][1][0][0]='5';
+I[24][1][0][1]='';
+I[24][1][0][2] = 0;
+I[24][1][1] = new Array();
+I[24][1][1][0]='2';
+I[24][1][1][1]='';
+I[24][1][1][2] = 0;
+I[24][1][2] = new Array();
+I[24][1][2][0]='4';
+I[24][1][2][1]='';
+I[24][1][2][2] = 0;
+I[24][1][3] = new Array();
+I[24][1][3][0]='3';
+I[24][1][3][1]='';
+I[24][1][3][2] = 1;
+I[24][2] = 0;
+
+I[25] = new Array();
+I[25][0]='Quelle est la charge d\'un ion comportant 13 protons, 10 électrons et 15 neutrons ?<br />';
+I[25][1] = new Array();
+I[25][1][0] = new Array();
+I[25][1][0][0]='+1';
+I[25][1][0][1]='';
+I[25][1][0][2] = 0;
+I[25][1][1] = new Array();
+I[25][1][1][0]='+3';
+I[25][1][1][1]='';
+I[25][1][1][2] = 1;
+I[25][1][2] = new Array();
+I[25][1][2][0]='-1';
+I[25][1][2][1]='';
+I[25][1][2][2] = 0;
+I[25][1][3] = new Array();
+I[25][1][3][0]='-3';
+I[25][1][3][1]='';
+I[25][1][3][2] = 0;
+I[25][2] = 0;
+
+I[26] = new Array();
+I[26][0]='Quel atome à l\'état  fondamental ne contient qu\'une orbitale partiellement remplie ?<br />';
+I[26][1] = new Array();
+I[26][1][0] = new Array();
+I[26][1][0][0]='Na (Z=11)';
+I[26][1][0][1]='';
+I[26][1][0][2] = 1;
+I[26][1][1] = new Array();
+I[26][1][1][0]='Ne (gaz noble Z=10)';
+I[26][1][1][1]='';
+I[26][1][1][2] = 0;
+I[26][1][2] = new Array();
+I[26][1][2][0]='Si ( Z=14)';
+I[26][1][2][1]='';
+I[26][1][2][2] = 0;
+I[26][1][3] = new Array();
+I[26][1][3][0]='Ca ( Z=20)';
+I[26][1][3][1]='';
+I[26][1][3][2] = 0;
+I[26][2] = 0;
+
+I[27] = new Array();
+I[27][0]='Quelle est la configuration d\'un gaz noble dans un état d\'excitation ?<br /><center><img src="../Images/nov02/atome14.gif" alt="atome14.gif" width="231" height="42" border="0"></img></center>';
+I[27][1] = new Array();
+I[27][1][0] = new Array();
+I[27][1][0][0]='proposition a';
+I[27][1][0][1]='';
+I[27][1][0][2] = 0;
+I[27][1][1] = new Array();
+I[27][1][1][0]='proposition b';
+I[27][1][1][1]='';
+I[27][1][1][2] = 0;
+I[27][1][2] = new Array();
+I[27][1][2][0]='proposition c';
+I[27][1][2][1]='';
+I[27][1][2][2] = 1;
+I[27][1][3] = new Array();
+I[27][1][3][0]='proposition d';
+I[27][1][3][1]='';
+I[27][1][3][2] = 0;
+I[27][2] = 0;
+
+I[28] = new Array();
+I[28][0]='Combien de couches électroniques sont complètes dans un atome de magnésium au niveau fondamental ?<br />Mg (Z=12)';
+I[28][1] = new Array();
+I[28][1][0] = new Array();
+I[28][1][0][0]='2';
+I[28][1][0][1]='';
+I[28][1][0][2] = 1;
+I[28][1][1] = new Array();
+I[28][1][1][0]='1';
+I[28][1][1][1]='';
+I[28][1][1][2] = 0;
+I[28][1][2] = new Array();
+I[28][1][2][0]='3';
+I[28][1][2][1]='';
+I[28][1][2][2] = 0;
+I[28][1][3] = new Array();
+I[28][1][3][0]='4';
+I[28][1][3][1]='';
+I[28][1][3][2] = 0;
+I[28][2] = 0;
+
+I[29] = new Array();
+I[29][0]='L\'élément X possède trois isotopes.<br /> Le mélange des trois isotopes possède la composition suivante: <br /><center><img src="../Images/nov02/atome15.gif" alt="atome15.gif" width="171" height="41" border="0"></img></center><br />Quelle la masse atomique moyenne de cet élément ?';
+I[29][1] = new Array();
+I[29][1][0] = new Array();
+I[29][1][0][0]='11';
+I[29][1][0][1]='12*0,7 + 11*0,2+ 10*0,1';
+I[29][1][0][2] = 0;
+I[29][1][1] = new Array();
+I[29][1][1][0]='12';
+I[29][1][1][1]='12*0,7 + 11*0,2+ 10*0,1';
+I[29][1][1][2] = 0;
+I[29][1][2] = new Array();
+I[29][1][2][0]='11,6';
+I[29][1][2][1]='';
+I[29][1][2][2] = 1;
+I[29][1][3] = new Array();
+I[29][1][3][0]='12,4';
+I[29][1][3][1]='12*0,7 + 11*0,2+ 10*0,1';
+I[29][1][3][2] = 0;
+I[29][2] = 0;
+
+I[30] = new Array();
+I[30][0]='Combien y a-t-il d\'orbitales dans la sous-couche 4f ?<br />';
+I[30][1] = new Array();
+I[30][1][0] = new Array();
+I[30][1][0][0]='5';
+I[30][1][0][1]='';
+I[30][1][0][2] = 0;
+I[30][1][1] = new Array();
+I[30][1][1][0]='7';
+I[30][1][1][1]='';
+I[30][1][1][2] = 1;
+I[30][1][2] = new Array();
+I[30][1][2][0]='3';
+I[30][1][2][1]='';
+I[30][1][2][2] = 0;
+I[30][1][3] = new Array();
+I[30][1][3][0]='1';
+I[30][1][3][1]='';
+I[30][1][3][2] = 0;
+I[30][2] = 0;
+
+I[31] = new Array();
+I[31][0]='Quelle configuration électronique corespond à un atome dans un état excité ?<br /><center><img src="../Images/nov02/atome16.gif" alt="atome16.gif" width="421" height="42" border="0"></img></center>';
+I[31][1] = new Array();
+I[31][1][0] = new Array();
+I[31][1][0][0]='proposition a';
+I[31][1][0][1]='';
+I[31][1][0][2] = 0;
+I[31][1][1] = new Array();
+I[31][1][1][0]='proposition b';
+I[31][1][1][1]='';
+I[31][1][1][2] = 1;
+I[31][1][2] = new Array();
+I[31][1][2][0]='proposition c';
+I[31][1][2][1]='';
+I[31][1][2][2] = 0;
+I[31][1][3] = new Array();
+I[31][1][3][0]='proposition d';
+I[31][1][3][1]='';
+I[31][1][3][2] = 0;
+I[31][2] = 0;
+
+I[32] = new Array();
+I[32][0]='Quelle est la configuration électronique du deutérium au niveau  fondamental ? (isotope de l\'hydrogène Z=1)<br />';
+I[32][1] = new Array();
+I[32][1][0] = new Array();
+I[32][1][0][0]='1s';
+I[32][1][0][1]='';
+I[32][1][0][2] = 1;
+I[32][1][1] = new Array();
+I[32][1][1][0]='1s² 2s';
+I[32][1][1][1]='';
+I[32][1][1][2] = 0;
+I[32][1][2] = new Array();
+I[32][1][2][0]='1s²';
+I[32][1][2][1]='';
+I[32][1][2][2] = 0;
+I[32][1][3] = new Array();
+I[32][1][3][0]='1s² 2s²';
+I[32][1][3][1]='';
+I[32][1][3][2] = 0;
+I[32][2] = 0;
+
+I[33] = new Array();
+I[33][0]='Combien d\'électrons y a-t-il dans la deuxième couche électronique d\'un atome de chlore au niveau fondamental ? Cl (Z=17)<br />';
+I[33][1] = new Array();
+I[33][1][0] = new Array();
+I[33][1][0][0]='5';
+I[33][1][0][1]='';
+I[33][1][0][2] = 0;
+I[33][1][1] = new Array();
+I[33][1][1][0]='7';
+I[33][1][1][1]='';
+I[33][1][1][2] = 1;
+I[33][1][2] = new Array();
+I[33][1][2][0]='17';
+I[33][1][2][1]='';
+I[33][1][2][2] = 0;
+I[33][1][3] = new Array();
+I[33][1][3][0]='8';
+I[33][1][3][1]='';
+I[33][1][3][2] = 0;
+I[33][2] = 0;
+
+I[34] = new Array();
+I[34][0]='Quelle est la configuration électronique de l\'ion de béryllium (avec une charge de +2 )?<br />Be (Z= 4)<br />';
+I[34][1] = new Array();
+I[34][1][0] = new Array();
+I[34][1][0][0]='1s';
+I[34][1][0][1]='';
+I[34][1][0][2] = 0;
+I[34][1][1] = new Array();
+I[34][1][1][0]='1s² 2s';
+I[34][1][1][1]='';
+I[34][1][1][2] = 0;
+I[34][1][2] = new Array();
+I[34][1][2][0]='1s²';
+I[34][1][2][1]='';
+I[34][1][2][2] = 1;
+I[34][1][3] = new Array();
+I[34][1][3][0]='1s² 2s²';
+I[34][1][3][1]='';
+I[34][1][3][2] = 0;
+I[34][2] = 0;
+
+I[35] = new Array();
+I[35][0]='Quel est le nombre total de nucléons (protons et neutrons) dans le noyau d\'un atome de sélénium ?<br />Se (Z= 34 ; A=79)<br />';
+I[35][1] = new Array();
+I[35][1][0] = new Array();
+I[35][1][0][0]='45';
+I[35][1][0][1]='';
+I[35][1][0][2] = 0;
+I[35][1][1] = new Array();
+I[35][1][1][0]='34';
+I[35][1][1][1]='';
+I[35][1][1][2] = 0;
+I[35][1][2] = new Array();
+I[35][1][2][0]='113';
+I[35][1][2][1]='';
+I[35][1][2][2] = 0;
+I[35][1][3] = new Array();
+I[35][1][3][0]='79';
+I[35][1][3][1]='';
+I[35][1][3][2] = 1;
+I[35][2] = 0;
+
+I[36] = new Array();
+I[36][0]='Le spectre caractéristique d\'un élément est produit lorsque :';
+I[36][1] = new Array();
+I[36][1][0] = new Array();
+I[36][1][0][0]='le niveau d\'énergie du noyau est élevé';
+I[36][1][0][1]='';
+I[36][1][0][2] = 0;
+I[36][1][1] = new Array();
+I[36][1][1][0]='des électrons passent à un niveau d\'énergie plus élevé';
+I[36][1][1][1]='';
+I[36][1][1][2] = 0;
+I[36][1][2] = new Array();
+I[36][1][2][0]='des électrons redescendent à un niveau d\'énergie plus faible';
+I[36][1][2][1]='';
+I[36][1][2][2] = 1;
+I[36][1][3] = new Array();
+I[36][1][3][0]='des électrons sont émis par l\'atome';
+I[36][1][3][1]='';
+I[36][1][3][2] = 0;
+I[36][2] = 0;
+
+I[37] = new Array();
+I[37][0]='Combien y a-t-il de sous-couches dans la quatrième couche électronique ?';
+I[37][1] = new Array();
+I[37][1][0] = new Array();
+I[37][1][0][0]='1';
+I[37][1][0][1]='';
+I[37][1][0][2] = 0;
+I[37][1][1] = new Array();
+I[37][1][1][0]='3';
+I[37][1][1][1]='';
+I[37][1][1][2] = 0;
+I[37][1][2] = new Array();
+I[37][1][2][0]='4';
+I[37][1][2][1]='';
+I[37][1][2][2] = 1;
+I[37][1][3] = new Array();
+I[37][1][3][0]='2';
+I[37][1][3][1]='';
+I[37][1][3][2] = 0;
+I[37][2] = 0;
+
+I[38] = new Array();
+I[38][0]='Quelle transition électronique s\'accompagne d\'émission d\'énergie ?<br />';
+I[38][1] = new Array();
+I[38][1][0] = new Array();
+I[38][1][0][0]='1s à 2s';
+I[38][1][0][1]='l\'atome absorbe de l\'énergie';
+I[38][1][0][2] = 0;
+I[38][1][1] = new Array();
+I[38][1][1][0]='3p à 4p';
+I[38][1][1][1]='l\'atome absorbe de l\'énergie';
+I[38][1][1][2] = 0;
+I[38][1][2] = new Array();
+I[38][1][2][0]='3p à 3s';
+I[38][1][2][1]='';
+I[38][1][2][2] = 1;
+I[38][1][3] = new Array();
+I[38][1][3][0]='2s à 2p';
+I[38][1][3][1]='l\'atome absorbe de l\'énergie';
+I[38][1][3][2] = 0;
+I[38][2] = 0;
+
+I[39] = new Array();
+I[39][0]='l\'ion oxyde  avec une charge négative de deux ( O 2-)  possède la même configuration que :<br />O(Z= 8) ; F( Z=9) ; K (Z=19) ; Ca (Z=20) ; S(Z=16)';
+I[39][1] = new Array();
+I[39][1][0] = new Array();
+I[39][1][0][0]='l\'ion fluorure F-';
+I[39][1][0][1]='';
+I[39][1][0][2] = 1;
+I[39][1][1] = new Array();
+I[39][1][1][0]='l\'atome de potassium K';
+I[39][1][1][1]='';
+I[39][1][1][2] = 0;
+I[39][1][2] = new Array();
+I[39][1][2][0]='l\'ion calcium Ca(2+)';
+I[39][1][2][1]='';
+I[39][1][2][2] = 0;
+I[39][1][3] = new Array();
+I[39][1][3][0]='l\'ion sulfure s (2-)';
+I[39][1][3][1]='';
+I[39][1][3][2] = 0;
+I[39][2] = 0;
+
+I[40] = new Array();
+I[40][0]='Combien d\'électrons de valence y a-t-il dans un atome avec la configuration électronique suivante ?<br /><center><img src="../Images/nov02/atome17.gif" alt="atome17.gif" width="162" height="44" border="0"></img></center><br />';
+I[40][1] = new Array();
+I[40][1][0] = new Array();
+I[40][1][0][0]='16';
+I[40][1][0][1]='';
+I[40][1][0][2] = 0;
+I[40][1][1] = new Array();
+I[40][1][1][0]='6';
+I[40][1][1][1]='';
+I[40][1][1][2] = 0;
+I[40][1][2] = new Array();
+I[40][1][2][0]='2';
+I[40][1][2][1]='';
+I[40][1][2][2] = 0;
+I[40][1][3] = new Array();
+I[40][1][3][0]='4';
+I[40][1][3][1]='';
+I[40][1][3][2] = 1;
+I[40][2] = 0;
+
+I[41] = new Array();
+I[41][0]='Un atome de magnésium ayant une charge positive de deux a la même configuration que :<br />Mg (Z=12) ; Ca (Z=20) ; Ar ( Z= 18) ; Ne (Z=10)<br />';
+I[41][1] = new Array();
+I[41][1][0] = new Array();
+I[41][1][0][0]='l\'ion fluorure F-';
+I[41][1][0][1]='';
+I[41][1][0][2] = 0;
+I[41][1][1] = new Array();
+I[41][1][1][0]='l\'ion calcium';
+I[41][1][1][1]='';
+I[41][1][1][2] = 0;
+I[41][1][2] = new Array();
+I[41][1][2][0]='atome de néon';
+I[41][1][2][1]='';
+I[41][1][2][2] = 1;
+I[41][1][3] = new Array();
+I[41][1][3][0]='atome d\'argon';
+I[41][1][3][1]='';
+I[41][1][3][2] = 0;
+I[41][2] = 0;
+
+I[42] = new Array();
+I[42][0]='L\'atome de quel élément, au niveau  fondamental, contient seulement un électron non-apparié dans sa couche de valence ?';
+I[42][1] = new Array();
+I[42][1][0] = new Array();
+I[42][1][0][0]='B (Z=5)';
+I[42][1][0][1]='';
+I[42][1][0][2] = 1;
+I[42][1][1] = new Array();
+I[42][1][1][0]='N (Z=7)';
+I[42][1][1][1]='';
+I[42][1][1][2] = 0;
+I[42][1][2] = new Array();
+I[42][1][2][0]='O (Z=8)';
+I[42][1][2][1]='';
+I[42][1][2][2] = 0;
+I[42][1][3] = new Array();
+I[42][1][3][0]='C (Z=6)';
+I[42][1][3][1]='';
+I[42][1][3][2] = 0;
+I[42][2] = 0;
+
+I[43] = new Array();
+I[43][0]='Combien y a-t-il d\'orbitales dans la sous-couche d de la troisième couche ?';
+I[43][1] = new Array();
+I[43][1][0] = new Array();
+I[43][1][0][0]='1';
+I[43][1][0][1]='';
+I[43][1][0][2] = 0;
+I[43][1][1] = new Array();
+I[43][1][1][0]='5';
+I[43][1][1][1]='';
+I[43][1][1][2] = 0;
+I[43][1][2] = new Array();
+I[43][1][2][0]='3';
+I[43][1][2][1]='';
+I[43][1][2][2] = 0;
+I[43][1][3] = new Array();
+I[43][1][3][0]='7';
+I[43][1][3][1]='';
+I[43][1][3][2] = 0;
+I[43][2] = 0;
+
+I[44] = new Array();
+I[44][0]='Combien y a-t-il de protons dans un atome de Cl (Z=17 et A=36) ?';
+I[44][1] = new Array();
+I[44][1][0] = new Array();
+I[44][1][0][0]='17';
+I[44][1][0][1]='';
+I[44][1][0][2] = 1;
+I[44][1][1] = new Array();
+I[44][1][1][0]='18';
+I[44][1][1][1]='';
+I[44][1][1][2] = 0;
+I[44][1][2] = new Array();
+I[44][1][2][0]='35';
+I[44][1][2][1]='';
+I[44][1][2][2] = 0;
+I[44][1][3] = new Array();
+I[44][1][3][0]='46';
+I[44][1][3][1]='';
+I[44][1][3][2] = 0;
+I[44][2] = 0;
+
+I[45] = new Array();
+I[45][0]='Quel transfert d\'énergie subi par un électron correspond à l\'émission  d\'énergie la plus élevée ?';
+I[45][1] = new Array();
+I[45][1][0] = new Array();
+I[45][1][0][0]='2s à 2p';
+I[45][1][0][1]='l\'atome absorbe de l\'énergie';
+I[45][1][0][2] = 0;
+I[45][1][1] = new Array();
+I[45][1][1][0]='3p à 4d';
+I[45][1][1][1]='l\'atome absorbe de l\'énergie';
+I[45][1][1][2] = 0;
+I[45][1][2] = new Array();
+I[45][1][2][0]='2p à 3s';
+I[45][1][2][1]='l\'atome absorbe de l\'énergie';
+I[45][1][2][2] = 0;
+I[45][1][3] = new Array();
+I[45][1][3][0]='3d à 2p';
+I[45][1][3][1]='';
+I[45][1][3][2] = 1;
+I[45][2] = 0;
+
+I[46] = new Array();
+I[46][0]='Combien d\'orbitales trouve-t-on dans n\'importe quelle sous-couche p ?';
+I[46][1] = new Array();
+I[46][1][0] = new Array();
+I[46][1][0][0]='1';
+I[46][1][0][1]='';
+I[46][1][0][2] = 0;
+I[46][1][1] = new Array();
+I[46][1][1][0]='2';
+I[46][1][1][1]='';
+I[46][1][1][2] = 0;
+I[46][1][2] = new Array();
+I[46][1][2][0]='3';
+I[46][1][2][1]='';
+I[46][1][2][2] = 1;
+I[46][1][3] = new Array();
+I[46][1][3][0]='5';
+I[46][1][3][1]='';
+I[46][1][3][2] = 0;
+I[46][2] = 0;
+
+I[47] = new Array();
+I[47][0]='Combien y a-t-il de neutrons dans un atome de potassium K (Z=19 et A=-39) ?<br />';
+I[47][1] = new Array();
+I[47][1][0] = new Array();
+I[47][1][0][0]='19';
+I[47][1][0][1]='';
+I[47][1][0][2] = 0;
+I[47][1][1] = new Array();
+I[47][1][1][0]='39';
+I[47][1][1][1]='';
+I[47][1][1][2] = 0;
+I[47][1][2] = new Array();
+I[47][1][2][0]='20';
+I[47][1][2][1]='';
+I[47][1][2][2] = 1;
+I[47][1][3] = new Array();
+I[47][1][3][0]='58';
+I[47][1][3][1]='';
+I[47][1][3][2] = 0;
+I[47][2] = 0;
+
+I[48] = new Array();
+I[48][0]='Laquelle des sous-couches suivantes possède le niveau d\'énergie le plus faible ?<br />';
+I[48][1] = new Array();
+I[48][1][0] = new Array();
+I[48][1][0][0]='4 f';
+I[48][1][0][1]='';
+I[48][1][0][2] = 0;
+I[48][1][1] = new Array();
+I[48][1][1][0]='4 d';
+I[48][1][1][1]='';
+I[48][1][1][2] = 0;
+I[48][1][2] = new Array();
+I[48][1][2][0]='4 p';
+I[48][1][2][1]='';
+I[48][1][2][2] = 0;
+I[48][1][3] = new Array();
+I[48][1][3][0]='4 s';
+I[48][1][3][1]='';
+I[48][1][3][2] = 1;
+I[48][2] = 0;
+
+I[49] = new Array();
+I[49][0]='Quel orbitale contient les électrons de valence dans un atome de calcium ?<br />Ca (Z=20)<br />';
+I[49][1] = new Array();
+I[49][1][0] = new Array();
+I[49][1][0][0]='2s';
+I[49][1][0][1]='';
+I[49][1][0][2] = 0;
+I[49][1][1] = new Array();
+I[49][1][1][0]='1s';
+I[49][1][1][1]='';
+I[49][1][1][2] = 0;
+I[49][1][2] = new Array();
+I[49][1][2][0]='3s';
+I[49][1][2][1]='';
+I[49][1][2][2] = 0;
+I[49][1][3] = new Array();
+I[49][1][3][0]='4s';
+I[49][1][3][1]='';
+I[49][1][3][2] = 1;
+I[49][2] = 0;
+
+
+Status = new Array();
+
+
+function CreateStatusArrays(){
+	for (var x=0; x<I.length; x++){
+		Status[x] = new Array();
+		Status[x][0] = 0; // Question not done yet
+		Status[x][1] = new Array(); //for tracking whether answers chosen
+		for (var y=0; y<I[x][1].length; y++){
+			Status[x][1][y] = '0'; //Answers not chosen yet
+		}
+		Status[x][2] = 0; //Wrong tries at this question so far
+		Status[x][3] = 0; //For storing score out of one on this question
+	}
+}
+
+function ReplaceStuff(Token, Replacement, InString){
+	var i = InString.indexOf(Token);
+	var FirstBit = '';
+	var LastBit = '';
+	while (i>-1){
+		FirstBit = InString.substring(0, i);
+		LastBit = InString.substring(i + Token.length, InString.length);	
+		InString = FirstBit + Replacement + LastBit;
+		i = InString.indexOf(Token);
+	}
+	return InString;
+}
+
+function ChangeQ(ChangeBy){
+	var NewNum = CurrQNum + ChangeBy;
+	if ((NewNum >= 0)&&(NewNum<I.length)){
+		CurrQNum = NewNum;
+		ShowQuestion(CurrQNum);
+	}
+	var CurrScore = '';
+	if ((ContinuousScoring == true)&&(EraseFeedback == true)){
+		CurrScore = YourScoreIs + ' ' + Score + '%.';
+		WriteFeedback(CurrScore);
+	}
+}
+
+function BuildQuestion(QNum){
+	if (I[QNum][2] == 0){
+		var Temp = ReplaceStuff('[Question]', I[QNum][0], QRow);
+
+		var AnsRows = '';
+		for (var i=0; i<I[QNum][1].length; i++){
+			TempAns = ARow;
+			TempAns = ReplaceStuff('[ANum]', i, TempAns);
+			TempAns = ReplaceStuff('[ALetter]', ' ' + ALetters.charAt(i) + ' ', TempAns);
+			TempAns = ReplaceStuff('[Ans]', I[QNum][1][i][0], TempAns);
+			AnsRows += TempAns;
+		}
+		Temp += AnsRows;
+		Temp = ReplaceStuff('[QNumber]', QNum+1, Temp);
+		Temp = ReplaceStuff('[QNum]', QNum, Temp);
+	}
+	else{
+		var Temp = ReplaceStuff('[Question]', I[QNum][0], QRow);
+		var AnsRows = '';
+		for (var i=0; i<I[QNum][1].length; i++){
+			TempAns = MARow;
+			TempAns = ReplaceStuff('[ANum]', i, TempAns);
+			TempAns = ReplaceStuff('[Correct]', I[QNum][1][i][2], TempAns);
+			TempAns = ReplaceStuff('[Ans]', I[QNum][1][i][0], TempAns);
+			AnsRows += TempAns;
+		}
+		Temp += AnsRows;
+		Temp += CheckButton;
+		Temp = ReplaceStuff('[QNumber]', QNum+1, Temp);
+		Temp = ReplaceStuff('[QNum]', QNum, Temp);
+	}
+	return Temp;
+}
+
+function DisplayExercise(StuffToDisplay){
+//Build the output string
+	var OutString = '';
+	OutString += '<html>';
+	OutString += '<body  background="graphique.gif" bgcolor="#FFFFFF" text="#000066" link="#0000ff" vlink="#0000cc">';
+	OutString += '<center><table border="0" cellpadding="5" cellspacing="1" width="85%">';
+	OutString += TitleCode; 
+	OutString += '<tr><td bgcolor="#FFFFFF" align="center">'; 
+	OutString += '<font face="Geneva,Arial" size="-1">';
+	OutString += StuffToDisplay;
+	OutString += '</font></td></tr>';
+	OutString += NavBar;
+	OutString += '</table></center></body></html>';
+
+	if (is.CRAPBrowser){OutString=ResolveAllURLs(OutString);}
+
+//Write it to the frame
+	BottomFrame.document.clear();
+	BottomFrame.document.open();
+	BottomFrame.document.write(OutString);
+	BottomFrame.document.close();
+}
+
+
+function ShowAllQs(){
+	var Output = '';
+	for (var i=0; i<I.length-1; i++){
+		Output = Output + BuildQuestion(i);
+		Output = Output + '<tr><td colspan="4"><hr></hr></td></tr>';
+	}
+	Output = Output + BuildQuestion(I.length-1);
+	Output = TableOpener + Output + TableCloser;
+	DisplayExercise(Output);
+}
+
+function ShowQuestion(QNum){
+//First, create the Q number readout at the top
+	var Readout = (QNum+1) + '/' + I.length;
+	while (Readout.length < 7){
+		Readout = ' ' + Readout + ' ';
+	}
+	Readout = QButtonsOpener + Readout + QButtonsCloser;
+
+	var Output = BuildQuestion(QNum);
+
+	Output = TableOpener + Output + TableCloser;
+
+	DisplayExercise(Readout + Output);
+
+//Mark the answers already done
+	for (i=0; i<Status[QNum][1].length; i++){
+		if (Status[QNum][1][i] == 'R'){
+			MarkAnswer(QNum,i,true)
+		}
+		if (Status[QNum][1][i] == 'W'){
+			MarkAnswer(QNum,i,false)
+		}
+		if (Status[QNum][1][i] == 'C'){
+			CheckCheckbox(QNum,i);
+		}
+	}
+//Eliminate feedback from previous question
+	if (EraseFeedback == true){
+		WriteFeedback('');
+	}
+}
+
+function CheckMulti(QNum){
+	var TotWrong = 0;
+	var Output = '';
+	var TotAns = I[QNum][1].length;
+	for (var i=TotAns-1; i>=0; i--){
+//Find any incorrect choices
+
+		var b = eval('BottomFrame.document.QForm.A_' + QNum + '_' + i);
+
+		if (b != null){
+//if it's wrong, count it
+			if (b.checked == true){
+				Status[QNum][1][i] = 'C';
+			}
+			else{
+				Status[QNum][1][i] = 'U';
+			}
+			if (((b.checked == true) && (b.value == "0"))||((b.checked == false)&&(b.value == "1"))){
+				TotWrong++;
+			}
+		}				
+	}
+
+	if (TotWrong == 0){
+		Output = DefaultRight;
+	}
+	else{
+		Output = DefaultWrong + '<br />' + (TotAns-TotWrong) + '/' + TotAns;
+	}
+
+//If you haven't tried the question before
+	if (Status[QNum][0] == 0){
+		if (TotWrong > 0){
+			Status[QNum][2]++;
+		}
+		if (TotWrong == 0){
+			Status[QNum][0] = 1;
+//Calculate the score for this question as a floating-point fraction of 1
+			Status[QNum][3] =  ((Status[QNum][1].length - Status[QNum][2]) - 1) / (Status[QNum][1].length - 1);
+//If less than zero, set to zero
+			if (Status[QNum][3] < 0){Status[QNum][3] = 0;}
+		}
+	}
+
+//Check whether the quiz is finished
+	var Finished = true;
+	for (var i=0; i<Status.length; i++){
+		if (Status[i][0] == 0){Finished = false;}
+	}
+
+//Calculate the score if needed
+		
+	if (Status[QNum][0] == 1){
+		if ((Finished==true)||(ContinuousScoring==true)){
+			var DoneQs = 0;
+			var TotalScore = 0;
+			for (var i=0; i<Status.length; i++){
+				if (Status[i][0] == 1){
+					DoneQs++;
+					TotalScore += Status[i][3];
+				}
+			}
+			Score = (Math.floor(100 * (TotalScore/DoneQs)));
+			Output = Output + '<br />' + YourScoreIs + ' ' + Score + '%.';
+		}
+
+		if (Finished == true){
+			EraseFeedback = false;
+			var CFT = 0;
+			for (i=0; i<I.length; i++){
+				if (Status[i][2] == 0){
+					CFT++;
+				}
+			}
+		Output += '<br />' + CorrectFirstTime + CFT + '/' + I.length;
+
+		}
+	}
+
+//Show the feedback
+	if (Output.length > 0){
+		WriteFeedback(Output);
+	}
+
+}
+
+function CheckAnswer(QNum, ANum){
+	var Output = I[QNum][1][ANum][1];
+
+	if (Output==''){
+		if (I[QNum][1][ANum][2] == 1){
+			Output = DefaultRight;
+		}
+		else{
+			Output = DefaultWrong;
+		}
+	}
+
+//If it's not been previously answered correctly
+	if (Status[QNum][0] == 0){
+//If it's a correct answer
+		if (I[QNum][1][ANum][2] == 1){
+			Status[QNum][0] = 1;//Mark the Q as done
+			Status[QNum][1][ANum] = 'R';
+			MarkAnswer(QNum, ANum, true);
+//Calculate the score for this question as a floating-point fraction of 1
+			var PossibleWrongs = 0;
+			for (var i=0; i<I[QNum][1].length; i++){
+				if (I[QNum][1][i][2] == 0){
+					PossibleWrongs++;
+				}
+			}
+
+			if (PossibleWrongs == 0){PossibleWrongs = 1;}
+
+			Status[QNum][3] = 1 - (Status[QNum][2]/PossibleWrongs);
+
+//If less than zero, set to zero
+			if (Status[QNum][3] < 0){Status[QNum][3] = 0;}
+		}
+		else{
+			if (Status[QNum][1][ANum] != 'W'){
+				Status[QNum][1][ANum] = 'W';
+				MarkAnswer(QNum, ANum, false);
+				Status[QNum][2]++; //increment wrong tries for this Q
+			}
+		}
+	}
+
+//Check whether the quiz is finished
+	var Finished = true;
+	for (var i=0; i<Status.length; i++){
+		if (Status[i][0] == 0){Finished = false;}
+	}
+
+//Calculate the score if needed
+		
+	if (Status[QNum][0] == 1){
+		if ((Finished==true)||(ContinuousScoring==true)){
+			var DoneQs = 0;
+			var TotalScore = 0;
+			for (var i=0; i<Status.length; i++){
+				if (Status[i][0] == 1){
+					DoneQs++;
+					TotalScore += Status[i][3];
+				}
+			}
+			Score = (Math.floor(100 * (TotalScore/DoneQs)));
+			Output = Output + '<br />' + YourScoreIs + ' ' + Score + '%.';
+		}
+
+		if (Finished == true){
+			EraseFeedback = false;
+			var CFT = 0;
+			for (i=0; i<I.length; i++){
+				if (Status[i][2] == 0){
+					CFT++;
+				}
+			}
+		Output += '<br />' + CorrectFirstTime + CFT + '/' + I.length;
+
+		}
+	}
+
+//Show the feedback
+	if (Output.length > 0){
+		WriteFeedback(Output);
+	}
+}
+
+function MarkAnswer(QNum, ANum, Right){
+	var Mark = CorrectIndicator;
+	if (Right == false){Mark = IncorrectIndicator;}
+
+	if (eval('BottomFrame.document.QForm.FB_' + QNum + '_' + ANum) != null){
+		eval('BottomFrame.document.QForm.FB_' + QNum + '_' + ANum).value = Mark;
+	}
+}
+
+function CheckCheckbox(QNum, ANum){
+	if (eval('BottomFrame.document.QForm.A_' + QNum + '_' + ANum) != null){
+		eval('BottomFrame.document.QForm.A_' + QNum + '_' + ANum).checked = true;
+	}
+}
+
+
+
+
+
+
+
+function Blank(){
+	return '<html><body>©Half-Baked Software. Loading...</body></html>';
+}
+
+//-->
+
+//]]>
+
+</script>
+
+
+<!--<body>Fool those dumb ad-inserting ISPs</body>-->
+
+<!--For full XHTML 1.0 compatibility, remove the border and framespacing attributes.
+These are required for proper display in current browsers, but render the document incompatible. Then, you'll need to add the appropriate Document Type Declaration; use
+the W3C XHTML 1 frameset DTD.-->
+
+
+</head><frameset rows="25%,*" onload="StartUp()" framespacing="0" border="0">
+	<frame src="javascript:parent.Blank()" frameborder="0" name="TopFrame">
+	<frame src="javascript:parent.Blank()" frameborder="0" name="BottomFrame">
+</frameset>
+
+
+
+
+</html>

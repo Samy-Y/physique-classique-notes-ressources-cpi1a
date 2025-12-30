@@ -357,12 +357,7 @@ Le discriminant $\Delta = B^2 - 4AC$ nous dit tout :
 * $\Delta = 0$ : Genre **Parabole**.
 * $\Delta > 0$ : Genre **Hyperbole**.
 
-<iframe 
-    src="coniques.html" 
-    width="100%" 
-    height="500px" 
-    style="border:none; border-radius: 8px; background: #0f172a;">
-</iframe>
+**Site web intéressant pour visualiser les coniques :** [https://www.geogebra.org/m/nqcfbzms](Conic Sections in 3D Space - GeoGebra)
 
 ---
 
