@@ -182,6 +182,10 @@ $$\implies \boxed{\Delta E_c = \frac{q^2 E^2}{m} \frac{(t_2^2 - t_1^2)}{2} + qE 
 
 On étudie ensuite le signe de $\Delta E_c$ pour déterminer si la particule accélère ou décélère.
 
+On peut aussi étudier le signe de $\frac{dE_c}{dt} = q\vec{E}\cdot \vec{v} = \mathcal{P}(\vec{F}_E)$.
+
+Si cette dernière puissance est strictement positive, alors la particule est accélérée. Si elle est strictement négative, alors la particule est décélérée.
+
 **Applications : accélérateurs linéaires**
 
 ## Champ magnétique $\vec{B}$
@@ -328,3 +332,192 @@ Le vecteur vitesse $\vec{v}$ de la particule chargée effectue, en quelque sorte
 
 On reprend l'équation du mouvement général :
 $$\frac{d\vec{v}}{dt} = \frac qm \left(\vec{E} + \vec{v} \wedge \vec{B}\right)$$
+
+---
+
+## Récapitulatif post-vacances
+
+**On étudiera uniquement l'action du champ électrique dans cette partie :**
+- Particule définie par $q,m,\vec{v_0}$ dans un référentiel galiléen.
+- Action d'un champ électrique uniforme et constant $\vec{E}$.
+- Équation du mouvement : $\frac{d\vec{v}}{dt} = \frac qm \vec{E}$
+- Énergie cinétique : $\frac d{dt} E_c = q\vec{E}\cdot \vec{v} = \mathcal{P}(\vec{F}_E)$
+  - Si $\vec{E}\cdot \vec{v} > 0$ : accélération
+  - Si $\vec{E}\cdot \vec{v} < 0$ : décélération
+  - Selon le signe de $q$, la particule va vers la plaque positive (potentiel élevé) ou négative (potentiel faible).
+- Trajectoire parabolique dans le plan $(\vec{v_0}, \vec{E})$.
+
+**Etude du champ magnétique $\vec{B}$**
+- Force magnétique : $\vec{F}_m = q\vec{v} \wedge \vec{B}$
+  - Cette force ne développe pas de puissance parce que le produit scalaire de $\vec{F}_m$ avec le vecteur vitesse est nul ($(q\vec{v} \wedge \vec{B}) \cdot \vec{v} = 0$).
+  - Donc l'énergie cinétique $E_c$ est constante (${d\vec{v}}{dt}=\vec{0}$). **Le mouvement est uniforme**.
+- Équation du mouvement : $\frac{d\vec{v}}{dt} = \frac qm \vec{v} \wedge \vec{B}$ (équation différentielle)
+- Le champ magnétique n'a donc qu'un unique effet : celui de **courber la trajectoire**.
+- Si le vecteur vitesse $\vec{v_0}$ est perpendiculaire à $\vec{B}$, la **trajectoire est circulaire** dans le plan perpendiculaire à $\vec{B}$.
+
+<img src="./mouvement-alpha-piege.gif" alt="Trajectoire circulaire d'une particule chargée dans un champ magnétique" style="max-width:100%;height:auto;">
+
+*On peut clairement imaginer à travers ce schéma comment si le vecteur vitesse $\vec{v_0}$ n'est pas perpendiculaire à $\vec{B}$, la trajectoire sera hélicoïdale, et que s'il n'a pas de composante selon $\vec{B}$, la trajectoire sera circulaire.*
+
+---
+
+# Cyclotron de Lawrence
+
+Le cyclotron est un accélérateur de particules inventé par Ernest O. Lawrence en 1932. Il utilise un champ magnétique pour courber la trajectoire des particules chargées et un champ électrique alternatif pour les accélérer.
+
+<img src="./cyclotronc.jpg" alt="Schéma d'un cyclotron" style="max-width:100%;height:auto;">
+
+À l'intérieur du cyclotron, dans les cavités, les particules sont **soumises à l'action unique du champ magnétique**. L'effet électrique n'entre pas en jeu. Entre les deux cavités, les particules sont accélérées par un champ électrique alternatif, et là-bas, l'effet magnétique n'entre pas en jeu.
+
+<img src="./cyclotron bien détaillé.png" alt="Schéma détaillé d'un cyclotron" style="max-width:100%;height:auto;">
+
+*Schéma détaillé d'un cyclotron (la tension est sinusoïdale ici, pas carré comme on étudiera ci-dessous)*
+
+**Étude du cyclotron original construit en 1932**
+
+On propose d'étudier le premier cyclotron construit. L'appareil a les caractéristiques suivantes :
+- Rayon : 14 cm.
+- Différence de potentiel entre les deux cavités : 4000 V.
+- Vitesse initiale des particules : nulle.
+- On admet que la tension générée entre les deux cavités est alternative mais **carrée**, de pulsation $\omega_c$, telle que $T=\frac{2\pi}{\omega_c}$ (pour simplifier les calculs).
+- On admet que les protons étudiés sont classiques (non relativistes) afin de conserver la relation $E_c = \frac 12 mv^2$. En mécanique relativiste, un nouveau facteur $\gamma=\frac{1}{\sqrt{1-\frac{v^2}{c^2}}}$ entre en jeu (relativité restreinte).
+  - On dit que les protons restent classiques parce que l'énergie cinétique va être bien inférieure à l'énergie de masse (qui est $E_0 = mc^2$).
+- On néglige le temps de passage lors des phases d'accélération entre les deux cavités (temps de passage très faible devant la période $T$).
+
+On cherche à déterminer :
+- La vitesse maximal des protons accélérés.
+- La tension accélératrice qu'il faut appliquer entre les deux cavités pour que les protons puissent être accélérés de manière synchrone avec le champ électrique alternatif.
+
+→ **Détermination de la vitesse maximale des protons accélérés**
+La vitesse maximale atteinte par les protons est de : $v=\sqrt{2E_c/m}$.
+
+On sait que l'énergie cinétique sera conservée tout au long du déplacement dans le cyclotron, sauf lors des passages entre les deux cavités où les protons sont accélérés par le champ électrique. On a donc $E_c = 1,2$ MeV (énergie cinétique maximale atteinte par les protons).
+
+On effectue donc l'application numérique suivante pour trouver $v=1,52\cdot 10^7$ m/s.
+
+**Remarque :** $\frac vc = 0,05$, donc la vitesse des protons est bien inférieure à la vitesse de la lumière. On peut donc considérer que les protons sont classiques.
+
+→ **Détermination de la tension d'accélération**
+
+On applique le **théorème de l'énergie cinétique** entre les deux plaques :
+
+$$\frac12 mv^2 - 0 = qU$$
+
+$$\implies U = \frac{mv^2}{2q}=\frac{E_c}{q}$$
+
+En effectuant l'application numérique :
+
+$$U = 1,2\times10^6 \text{ V}$$
+
+→ **Détermination de la fréquence du champ accélérateur**
+
+La tension d'accélération doit être synchrone avec les temps de révolution dans le champ magnétique. Elle doit donc avoir une période $T$ égale à la période cyclotronique $T_c$ des protons dans le champ magnétique.
+
+$$T=T_c = \frac{2\pi}{\omega_c}$$
+
+*(on rappelle que le temps de passage entre les deux cavités est négligé)*
+
+L'expression de la fréquence du champ accélérateur est donc : $f=f_c = \frac{\omega_c}{2\pi}$. On rappelle que $\omega_c = \frac{|q|B}{m}$.
+
+**Pendant chaque passage entre les deux plaques, les protons vont gagner en vitesse ; ils vont être accélérés.**
+
+On souhaite déterminer l'accélération subie par les protons entre ces deux plaques.
+
+On applique le théorème de l'énergie cinétique entre les deux plaques :
+
+$$\Delta E_c = qU$$
+$$\implies \frac12 m (v_{n+1}^2 - v_n^2) = qU$$
+$$\implies v_{n+1}^2 = v_n^2 + \frac{2qU}{m}$$
+
+En effectuant un calcul avec une somme téléscopique, on trouve l'expression de la vitesse après $n$ passages entre les deux plaques en fonction de la vitesse initiale $v_0$, qui est nulle ici :
+
+$$v_n^2 = n\frac{4qU}{m}$$
+
+<center>
+<b><i>NOTE : S'ASSURER DE L'EXPRESSION !</b></i>
+</center>
+
+On peut donc en déduire le nombre de passages $n$ nécessaires pour atteindre la vitesse maximale $v$ :
+
+$$n = \frac{mv^2}{4qU}$$
+
+On remplace $v$ par $v_max$ (la valeur à la fin du cyclotron) pour obtenir le nombre total de passages entre les deux plaques :
+
+$$n = \frac{E_cmax}{2qU}$$
+
+**En effectuant l'application numérique, on trouve $n=150$ passages entre les deux plaques pour atteindre la vitesse maximale des protons.**
+
+→ **Détermination de la valeur du champ magnétique B**
+
+On a $v_{max} = R\omega_c = R\frac{qB}{m}$.
+
+Donc $B = \frac{mv_{max}}{qR}$.
+
+En effectuant l'application numérique, on trouve $B=1,43$ T.
+
+## Exercice d'application (3)
+
+Dans cet exercice, on étudiera l'action du champ magnétique et du champ électrique sur une particule chargée.
+
+Ces deux champs seront orthogonaux entre eux.
+
+*Voir instructions dans la présentation PPT.*
+
+1. **Etude du mouvement de $M$**
+
+On applique le principe fondamental de la dynamique (PFD) à la particule chargée $q$ de masse $m$ :
+
+$$m\frac{d\vec{v}}{dt} = q\vec{E} + q\vec{v} \wedge \vec{B}$$
+
+On étudie le mouvement dans le plan $(i,j)$, avec $\vec{E} = E\vec{j}$ et $\vec{B} = B\vec{k}$.
+
+On projette le PFD dans le repère $(i,j,k)$ :
+
+$$\begin{cases}
+m\dot{v_i} =  qv_j B \\
+m\dot{v_j} = qE -qv_i B \\
+m\dot{v_k} = 0 \implies v_k = cte = 0
+\end{cases}$$
+
+$$\implies \begin{cases}
+\ddot{v_i} = \frac{qB}m[\frac{qE}m-\frac{qB}m v_i] \\
+\ddot{v_j} + \frac{q^2B^2}{m^2} v_j = \frac{q^2EB}{m^2}
+\end{cases}$$
+
+On résout les équations différentielles pour obtenir les expressions de $v_i(t)$ et $v_j(t)$.
+
+On a donc :
+$$\begin{cases}
+v_i(t) = \frac{E}{B} (1-\cos(\omega_c t)) \\
+v_j(t) = \frac{E}{B} \sin(\omega_c t)
+\end{cases}$$
+
+On intègre ces expressions pour obtenir les équations horaires $x(t)$ et $y(t)$ :
+
+$$\begin{cases}
+y(t) = \frac{E}{B\omega_c}(1 - \cos(\omega_c t)) = \frac1{\omega_c}v_i(t) \\
+x(t) = \frac{E}{B}t -\frac{E}{B\omega_c} \sin(\omega_c t) + \cancel{x_0} \text{ (si on prend } x_0=0\text{)}
+\end{cases}$$
+
+**Equation de trajectoire (courbe paramétrée par $\theta$)**
+
+$$\begin{cases}
+y(\theta)=\frac{E}{B\omega_c}(1 - \cos\theta) \\
+x(\theta)=\frac{E}{B\omega_c}(\theta - \sin\theta)
+\end{cases}$$
+
+*(sachant qu'on a $\omega_c t = \theta$)*
+
+<img src="./desmos.png" alt="Trajectoire cycloïde d'une particule chargée dans des champs électrique et magnétique orthogonaux" style="max-width:100%;height:auto;">
+
+On remarque que la trajectoire est une cycloïde.
+
+Le mouvement de la particule est limité à $y\ge 0$.
+
+La **vitesse de dérive** selon $x$ est donnée par : $v_x(t) = \frac{E}{B}(1 - \cos(\omega_c t))$.
+
+<img src="./vitesse_et_moyenne.png" alt="Vitesse selon x d'une particule chargée dans des champs électrique et magnétique orthogonaux" style="max-width:100%;height:auto;">
+
+**2. Détermination de la vitesse moyenne :**
+
+La vitesse moyenne selon $x$ est donnée par $<v_x> = \frac{E}{B}$.
