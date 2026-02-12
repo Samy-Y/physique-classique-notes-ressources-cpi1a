@@ -403,7 +403,9 @@ En insérant l'expression de $P(z)$, on obtient :
 
 $$n(z)=n_0 e^{-\frac{z}{H}}$$
 
-ou encore $$n(z)=n_0 e^{-\frac{N_A mg z}{RT}}$$
+ou encore : 
+
+$$n(z)=n_0 e^{-\frac{N_A mg z}{RT}}$$
 
 On pose $k_B = \frac{R}{N_A}$ (constante de Boltzmann).
 
@@ -504,3 +506,43 @@ En appliquant des forces différentes sur une face et l'autre face du capteur, o
 $$U=2k(P+P_0)$$
 
 où $P_0$ est la pression de référence (par exemple, la pression atmosphérique).
+
+
+### Interprétation de la pression
+
+<img src="./pression.gif" alt="Interprétation de la pression" style="max-width:70%;margin:20px 0;">
+
+On interprète la pression comme le résultat d'innombrables collisions de particules sur une surface donnée. Il s'agit d'un choc élastique entre les particules et la surface, donc l'angle d'incidence est égal à l'angle de réflexion, les vitesses avant et après le choc sont égales en norme. **Une particule a donc une quantité de mouvement.** Lorsqu'une particule entre en collision avec une surface, elle **échange de la quantité de mouvement avec cette surface.** Il y a donc une **action mécanique entre la particule et la surface.**
+
+## Coefficients thermo-élastiques
+
+Les coefficients thermo-élastiques nous permettent de caractériser le comportement des fluides (liquides et gaz) en fonction de la température et de la pression.
+
+1. **Coefficient de dilation isobare :** Ce coefficient va nous permettre de mesurer la variation relative de volume d'un fluide en fonction de la température, à **pression constante**. Il est défini comme suit :
+
+$$\alpha = \frac 1V \left(\frac{\partial V}{\partial T}\right)$$
+$$P= \text{cte}$$
+
+2. **Coefficient d'augmentation isochore :** Ce coefficient va nous permettre de mesurer la variation relative de pression d'un fluide en fonction de la température, à **volume constant**. Il est défini comme suit :
+
+$$\beta = \frac 1P \left(\frac{\partial P}{\partial T}\right)$$
+$$V= \text{cte}$$
+
+3. **Coefficient de compressibilité isotherme :** Ce coefficient nous permet de distinguer entre fluides *liquides* et fluides *gazeux*. 
+
+$$\chi_T = -\frac 1V \left(\frac{\partial V}{\partial P}\right)$$
+$$T= \text{cte}$$
+
+On peut aussi définir un coefficient de compressibilité isentropique $\chi_S$ (à revoir plus tard).
+
+Pour un fluide liquide, on a $\chi_T \approx 0$ (incompressible), par exemple pour l'eau, $\chi_T \approx 10^{-10}~\text{Pa}^{-1}=10^{-5}~\text{bar}^{-1}$.
+
+Si $\Delta P = 1$ bar, alors la variation relative de volume est de l'ordre de $10^{-5}$. Pour un volume d'eau de 10 Litres, la variation de volume est donc de l'ordre de $0.1~cm^3$, ce qui est négligeable devant 1 L. Pour une variation $\Delta P = 1000$ bar, la variation relative de volume est de l'ordre de $10^{-2}$. Pour un volume d'eau de 10 Litres, la variation de volume est donc de l'ordre de 0,1 L, ce qui reste faible devant 10 L.
+
+Pour un gaz parfait, on a $\chi_T = - \frac 1V \left(-\frac{nRT}{P^2}\right) = \frac{1}{P}$ (déduit trivialement à partir de l'équation d'état des gaz parfaits $PV=nRT$).
+
+De même, on peut déterminer le reste des coefficients thermo-élastiques pour un gaz parfait :
+
+$$\alpha = \frac 1V \left(\frac{nR}{P}\right) = \frac{1}{T}$$
+
+$$\beta = \frac 1P \left(\frac{nR}{V}\right) = \frac{1}{T}$$
