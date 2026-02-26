@@ -76,13 +76,8 @@ Bien sûr, $Q_{réel}$ et $W_{réel}$ à un certain instant ne coïncident pas a
 
 *Bonus : Le troisième principe de la thermodynamique stipule que $T=0K$ si tous les degrés de liberté sont gelés au niveau microscopique.*
 
-<div style="background:#f0f0f0;padding:20px;border-left:10px solid #ccc; margin: 0px 0px 10px 0px">
-
-<span style="font-size:24px">Échelle de température</span>
-
-- Échelle de Celsius : $T(°C) = T(K) - 273.15$. Définie sur les points fixes de l'eau à $1$ atm (0°C et 100°C). Le fait que la relation soit aussi simple est purement aléatoire (évolution parfaitement proportionnelle au Kelvin). Ce n'est pas le cas des autres échelles (comme l'échelle Fahrenheit).
-
-</div>
+>[!NOTE] Échelle de température
+> Échelle de Celsius : $T(°C) = T(K) - 273.15$. Définie sur les points fixes de l'eau à $1$ atm (0°C et 100°C). Le fait que la relation soit aussi simple est purement aléatoire (évolution parfaitement proportionnelle au Kelvin). Ce n'est pas le cas des autres échelles (comme l'échelle Fahrenheit).
 
 ## Transformations possibles
 
@@ -202,13 +197,10 @@ L'unité de la pression est le Pascal (Pa = N/m² = kg/m.s²). $1~\text{atm} = 1
 
 ## Loi fondamentale de l'hydrostatique
 
-<div style="border-left:5px solid #ccc;background:#f0f0f0;padding:20px;">
-
-<span style="font-size:24px">Définition d'un gradient</span>
-
-Le gradient est un opérateur différentiel qui s'applique à une fonction scalaire et qui nous permet d'obtenir la direction de euh
-
-$$\overrightarrow{grad}=\left|
+>[!NOTE] Définition d'un gradient
+>Le gradient est un opérateur différentiel qui s'applique à une fonction scalaire et qui nous permet d'obtenir la direction de l'augmentation maximale de cette fonction.
+>
+> $$\overrightarrow{grad}=\left|
     \begin{array}{ll}
         \frac{\partial}{\partial x} \\
         \frac{\partial}{\partial y} \\
@@ -216,30 +208,12 @@ $$\overrightarrow{grad}=\left|
     \end{array}
     \right.$$
 
-</div>
+Le gradient de la pression $P$ dans un fluide est égal à la densité volumique de force gravitationnelle exercée par le fluide :
 
-$$\overrightarrow{grad}=\rho \vec{g}$$
+$$\overrightarrow{grad}~P=\rho \vec{g}$$
 
-**Remarque :** si une autre force <!-- laquelle ?? --> intervient avec la densité volumique $\vec{F}_v$, alors $\overrightarrow{grad}P=\vec{F}_v+\rho\vec{g}$.
-
-<!-- calcul à reprendre -->
-
-**Application : Nous allons montrer que la surface de contact de l'eau avec l'air dans la figure sera à la même hauteur (même pression atmosphérique)**
-
-<img src="./vases_comm.png" style="max-width:50%">
-
-*non recopié*
-
-<!-- espace pour recopier à l'écrit -->
-<!-- avec divs html -->
-
-<div style="margin:20px 0;padding:30px;border:5px solid #eee;background:#fcfcfc; padding-bottom:500px; border-radius:20px;box-shadow:0 0 10px rgba(0,0,0,0.1);">
-
-<span style="font-size:24px">Démonstration à refaire ;)</span>
-<hr>
-<p style="min-width:100%;text-align:right;margin:0;padding:0;"><i>(j'ai pas recopié)</i></p>
-
-</div>
+>[!IMPORTANT]
+>Si une autre force (comme la tension de surface, par exemple) intervient avec la densité volumique $\vec{F}_v$, alors $\overrightarrow{grad}P=\vec{F}_v+\rho\vec{g}$.
 
 **Dans un fluide incompressible, $\rho$ est indépendant de la pression $P$.**
 
@@ -274,12 +248,7 @@ Donc $P_B - P_A = 1000 \times 10 \times 10 = 10^5 ~Pa$
 
 Donc $P_B = P(-h) = 2.013 \times 10^5 ~Pa \approx 2 ~atm$
 
-<div style="margin:20px 0;padding:10px;border-left:5px solid #a5b8d6;background:#d3def0;">
-
-<span style="font-size:24px">Fosses marines</span>
-
-Les fosses marines les plus profondes atteignent environ $11~km$ de profondeur. La pression y est donc d'environ $1100~atm$.
-</div>
+> Les fosses marines les plus profondes atteignent environ $11~km$ de profondeur. La pression y est donc d'environ $1100~atm$.
 
 ### Exemple 2 : Liquides non-miscibles
 
@@ -329,7 +298,7 @@ On pose $H = \frac{RT}{Mg}$ (hauteur caractéristique).
 
 Après résolution de l'équation différentielle, on obtient :
 
-$P(z)=P_0 e^{-\frac{z}{H}}$
+$$\boxed{P(z)=P_0 e^{-\frac{z}{H}}}$$
 
 <img src="pression_altitude.avif" alt="Pression en fonction de l'altitude" style="min-width:70%;margin:20px 0;">
 
@@ -370,7 +339,8 @@ $$P(z) = P_0 \left(1 - \frac{\alpha z}{T_0}\right)^{\frac{T_0}{H\alpha}}$$
 
 La caractéristique $\frac{T_0}{\alpha}$ est égale à environ $46\times10^3~m$.
 
-**Dans des altitudes relativement faibles, en dessous par exemple de $10~km$, on peut négliger $\frac{\alpha z}{T_0}$ devant $1$, et faire un développement limité au premier ordre pour retrouver l'expression précédente de la pression en fonction de l'altitude.**
+>[!TIP] Développement limité
+> Dans des altitudes relativement faibles, en dessous par exemple de $10~km$, on peut négliger $\frac{\alpha z}{T_0}$ devant $1$, et faire un développement limité au premier ordre pour retrouver l'expression précédente de la pression en fonction de l'altitude.
 
 ### Densité de l'air en fonction de l'altitude
 
@@ -382,14 +352,8 @@ En remplaçant dans l'équation d'état des gaz parfaits, on obtient :
 
 $$\rho = \frac{PM}{RT} = \frac{PmN_A}{RT}$$
 
-<div style="margin:20px 0;padding:10px;border-left:5px solid #aed6be;background:#e8fff1;">
-
-<span style="font-size:24px">Nouvelle grandeur</span>
-
-Nous allons définir une nouvelle grandeur $n$ qui représente le nombre de particules par unité de volume, telle que $n=\frac NV$.
-
-**C'est cette grandeur que nous allons utiliser pour étudier la densité de l'air.**
-</div>
+> Nous allons définir une nouvelle grandeur $n$ qui représente le nombre de particules par unité de volume, telle que $n=\frac NV$.
+> **C'est cette grandeur que nous allons utiliser pour étudier la densité de l'air.**
 
 On sait que $\rho = nm$, où $n$ est le nombre de particules par unité de volume.
 
@@ -415,42 +379,31 @@ $$\boxed{n(z)=n_0 e^{-\frac{mgz}{k_B T}}}$$
 
 Cette expression nous permet donc de déterminer la distribution de la densité de particules dans un gaz parfait en fonction de l'altitude, en supposant une évolution isotherme.
 
-<div style="margin:20px 0;padding:10px;border-left:5px solid #f5b7b1;background:#ffeaea;">
-
-<span style="font-size:24px">Probabilité de présence</span>
-
-On peut interpréter cette expression en termes de probabilité de présence d'une particule à une altitude $z$ donnée.
-
-La probabilité $P(z)$ de trouver une particule à une altitude $z$ est proportionnelle à la densité de particules à cette altitude :
-
-$$\frac{dN}{N} = \frac{n(z) dV}{N}$$
-où $N$ est le nombre total de particules dans le volume considéré.
-
-</div>
+>[!NOTE]Probabilité de présence
+> On peut interpréter cette expression en termes de probabilité de présence d'une particule à une altitude $z$ donnée.
+>
+> La probabilité $P(z)$ de trouver une particule à une altitude $z$ est proportionnelle à la densité de particules à cette altitude :
+> $$\frac{dN}{N} = \frac{n(z) dV}{N}$$
+> où $N$ est le nombre total de particules dans le volume considéré.
 
 <!-- facteur de boltzmann -->
 
-<div style="margin:20px 0;padding:10px;border-left:5px solid #d7bde2;background:#f4e1ff;">
-
-<span style="font-size:24px">Facteur de Boltzmann</span>
-
-Le terme exponentiel $e^{-\frac{mgz}{k_B T}}$ est appelé le facteur de Boltzmann. Il décrit comment la probabilité de présence d'une particule diminue avec l'altitude en raison de l'effet combiné de la gravité et de la température.
-
-Il apparaît à chaque fois qu'on étudie un système dont les particules sont indépendantes, en équilibre avec un thermostat à température $T$. On étudie alors la probabilité de présence d'une particule dans un état d'énergie $\varepsilon$.
-
-La probabilité de trouver une particule dans un état d'énergie $\varepsilon$ est proportionnelle à $e^{-\frac{\varepsilon}{k_B T}}$.
-
-$$P(\varepsilon) = C\cdot e^{-\frac{\varepsilon}{k_B T}}$$
-
-Étudions par exemple la probabilité de trouver une particule à deux états énergétiques $\varepsilon_1$ et $\varepsilon_2$ tels que $\varepsilon_2 > \varepsilon_1$.
-
-On a $\frac{N_2}{N_1} = \frac{P(\varepsilon_2)}{P(\varepsilon_1)} = e^{-\frac{(\varepsilon_2 - \varepsilon_1)}{k_B T}}$.
-
-On remarque que ce ratio augmente avec la température $T$ et diminue avec la différence d'énergie $\varepsilon_2 - \varepsilon_1$.
-
-Cela explique par exemple pourquoi certaines planètes perdent leur atmosphère ; Mercure a une température élevée et une faible gravité, ce qui permet aux particules de haute énergie d'échapper à l'attraction gravitationnelle de la planète. Titan, une lune de Saturne, a une température bien plus basse mais une gravité plus faible que la Terre, ce qui lui permet de retenir une atmosphère très dense.
-
-</div>
+>[!IMPORTANT] Facteur de Boltzmann
+> Le terme exponentiel $e^{-\frac{mgz}{k_B T}}$ est appelé le facteur de Boltzmann. Il décrit comment la probabilité de présence d'une particule diminue avec l'altitude en raison de l'effet combiné de la gravité et de la température.
+>
+> Il apparaît à chaque fois qu'on étudie un système dont les particules sont indépendantes, en équilibre avec un thermostat à température $T$. On étudie alors la probabilité de présence d'une particule dans un état d'énergie $\varepsilon$.
+>
+> La probabilité de trouver une particule dans un état d'énergie $\varepsilon$ est proportionnelle à $e^{-\frac{\varepsilon}{k_B T}}$.
+>
+> $$P(\varepsilon) = C\cdot e^{-\frac{\varepsilon}{k_B T}}$$
+> 
+>où $C$ est une constante de normalisation qui garantit que la somme des probabilités sur tous les états possibles est égale à 1.
+>
+> Étudions par exemple la probabilité de trouver une particule à deux états énergétiques $\varepsilon_1$ et $\varepsilon_2$ tels que $\varepsilon_2 > \varepsilon_1$.
+>
+> On a $\frac{N_2}{N_1} = \frac{P(\varepsilon_2)}{P(\varepsilon_1)} = e^{-\frac{(\varepsilon_2 - \varepsilon_1)}{k_B T}}$. On remarque que ce ratio augmente avec la température $T$ et diminue avec la différence d'énergie $\varepsilon_2 - \varepsilon_1$.
+>
+> Cela explique par exemple pourquoi certaines planètes perdent leur atmosphère ; Mercure a une température élevée et une faible gravité, ce qui permet aux particules de haute énergie d'échapper à l'attraction gravitationnelle de la planète. Titan, une lune de Saturne, a une température bien plus basse mais une gravité plus faible que la Terre, ce qui lui permet de retenir une atmosphère très dense.
 
 ### Théorème d'Archimède/Poussée d'Archimède
 
@@ -480,13 +433,18 @@ Le mercure a donc été utilisé pour cette expérience en raison de sa haute de
 
 <img src="./mercure_experience.svg" alt="Expérience de Torricelli" style="width:70%;margin:20px 0;">
 
-**Note :** Le mercure a une pression de passage à l'état gazeux très faible. Dans le schéma, Torricelli a considéré que le reste de la colonne en haut est vide, ce qui est une approximation acceptable.
+>[!NOTE] Passage à l'état gazeux du mercure
+> Le mercure a une pression de passage à l'état gazeux très faible. Dans le schéma, Torricelli a considéré que le reste de la colonne en haut est vide, ce qui est une approximation acceptable. *(Se renseigner sur le diagramme de phase du mercure pour comprendre pourquoi cette approximation est acceptable).*
 
 Après avoir rempli le tube de mercure et l'avoir retourné dans le bassin, une colonne de mercure de hauteur $h$ reste dans le tube. La pression au sommet de la colonne est négligeable (approximée à zéro).
 
 La pression exercée par la colonne de mercure à sa base est donc égale à la pression atmosphérique. On a donc effectué une mesure **absolue** de la pression atmosphérique.
 
 On peut donc utiliser ensuite des manomètres différentiels pour mesurer des pressions relatives par rapport à cette pression absolue.
+
+>[!IMPORTANT]Principe de Torricelli
+> La pression exercée par une colonne de liquide est proportionnelle à la hauteur de cette colonne.
+> $$P \propto h$$
 
 <!-- tableau récapitulatif des capteurs de pression -->
 

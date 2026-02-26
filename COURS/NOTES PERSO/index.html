@@ -1,42 +1,105 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Notes personnelles de Physique-Chimie</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-            background-color: #f9f9f9;
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        table { border-collapse: collapse; }
+        th, td { padding: 6px 16px; text-align: left; border: 1px solid #ccc; }
+        th { background: #eee; }
+        .good-quality-square {
+            width: 16px;
+            height: 16px;
+            background-color: #75c038;
         }
-        h1 {
-            color: #333;
+        .very-good-quality-square {
+            width: 16px;
+            height: 16px;
+            background-color: #1a7408;
         }
-        ul {
-            list-style-type: none;
-            padding: 0;
+        .medium-quality-square {
+            width: 16px;
+            height: 16px;
+            background-color: #f0ad4e;
         }
-        li {
-            margin: 10px 0;
-        }
-        a {
-            text-decoration: none;
-            color: #1a73e8;
-        }
-        a:hover {
-            text-decoration: underline;
+        .low-quality-square {
+            width: 16px;
+            height: 16px;
+            background-color: #d9534f;
         }
     </style>
 </head>
 <body>
     <h1>Notes personnelles de Physique-Chimie</h1>
-    <i>Samy Youssoufine</i>
-    <ul>
-        <li>Forces Centrales | <a href="./Forces Centrales/FORCES CENTRALES NOTES PERSO.pdf">PDF</a> &mdash; <a href="./Forces Centrales/Mouvements à force centrale.html">Webview</a></li>
-        <li>Mouvement dans un champ électromagnétique | <a href="./Mouvement dans un champ électromagnétique/Mouvement d’une particule chargée dans un champ électrique et_ou magnétique uniforme et permanent.pdf">PDF</a> &mdash; <a href="./Mouvement dans un champ électromagnétique/Mvt dans champ magnétique.html">Webview</a></li>
-        <li>Introduction à la thermodynamique | <a href="./Introduction à la Thermodynamique/Introduction à la thermodynamique.pdf">PDF</a> &mdash; <a href="./Introduction à la Thermodynamique/intro_thermodynamique.html">Webview</a></li>
-    </ul>
-
+    <p><i>Samy Youssoufine</i></p>
+    <h2>Cours de Physique</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Chapitre</th>
+                <th>PDF</th>
+                <th>Webview</th>
+                <th>Qualité</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Forces Centrales</td>
+                <td><a href="./Forces Centrales/FORCES CENTRALES NOTES PERSO.pdf">PDF</a></td>
+                <td><a href="./Forces Centrales/Mouvements à force centrale.html">Webview</a></td>
+                <td><div class="good-quality-square"></div></td>
+            </tr>
+            <tr>
+                <td>Mouvement dans un champ électromagnétique</td>
+                <td><a href="./Mouvement dans un champ électromagnétique/Mouvement d'une particule chargée dans un champ électrique et_ou magnétique uniforme et permanent.pdf">PDF</a></td>
+                <td><a href="./Mouvement dans un champ électromagnétique/Mvt dans champ magnétique.html">Webview</a></td>
+                <td><div class="very-good-quality-square"></div></td>
+            </tr>
+            <tr>
+                <td>Introduction à la thermodynamique</td>
+                <td><a href="./Introduction à la Thermodynamique/Introduction à la thermodynamique.pdf">PDF</a></td>
+                <td><a href="./Introduction à la Thermodynamique/intro_thermodynamique.html">Webview</a></td>
+                <td><div class="good-quality-square"></div></td>
+            </tr>
+            <tr>
+                <td>Cinétique des gaz parfaits</td>
+                <td><a href="./Cinétique des Gaz Parfaits/Cinétique des gaz parfaits.pdf">PDF</a></td>
+                <td><a href="./Cinétique des Gaz Parfaits/cinetique_gaz_parfaits.html">Webview</a></td>
+                <td><div class="medium-quality-square"></div></td>
+            </tr>
+            <tr>
+                <td>Premier principe de la thermodynamique</td>
+                <td><a href="./Premier principe de la thermodynamique/Premier principe de la thermodynamique.pdf">PDF</a></td>
+                <td><a href="./Premier principe de la thermodynamique/premier_principe.html">Webview</a></td>
+                <td><div class="good-quality-square"></div></td>
+            </tr>
+            <tr>
+                <td>Deuxième principe de la thermodynamique</td>
+                <td><a href="./Deuxième principe de la thermodynamique/Deuxième principe de la thermodynamique.pdf">PDF</a></td>
+                <td><a href="./Deuxième principe de la thermodynamique/deuxieme_principe.html">Webview</a></td>
+                <td><div class="medium-quality-square"></div></td>
+            </tr>
+        </tbody>
+    </table>
+    <h2>Cours de Chimie</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Chapitre</th>
+                <th>PDF</th>
+                <th>Webview</th>
+                <th>Qualité</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Atome polyélectronique</td>
+                <td><a href="./Atome polyélectronique/Atome polyélectronique.pdf">Indisponible</a></td>
+                <td><a href="./Atome polyélectronique/atome_polyelectronique.html">Webview</a></td>
+                <td><div class="low-quality-square"></div></td>
+            </tr>
+        </tbody>
 </body>
 </html>

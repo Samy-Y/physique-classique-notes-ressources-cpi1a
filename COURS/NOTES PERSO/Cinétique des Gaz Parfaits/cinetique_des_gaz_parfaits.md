@@ -74,14 +74,14 @@ $$ E_c = \frac{1}{2} m ||\vec v||^2 $$
 
 Donc la distribution des vitesses peut aussi s'écrire en fonction de l'énergie cinétique.
 
-Le facteur de Boltzmann $e^{-\frac{E_c}{k_B T}}$ (vue dans le cours précédent) permet de relier l'énergie à la température.
+Le facteur de Boltzmann $e^{-\frac{E_c}{k_B T}}$ (vue dans le cours précédent) permet de relier l'énergie à la température. En effet, la probabilité $P$ d'avoir une énergie cinétique $E_c$ est proportionnelle à ce facteur de Boltzmann : $P(E_c) \propto e^{-\frac{E_c}{k_B T}}$.
 
 On a donc $\varphi(v) = A e^{-\frac{1}{2} \frac{m v^2}{k_B T}}$, avec $A$ une constante de normalisation.
 
 >[!NOTE]Justification mathématique (hors programme)
-> La forme exponentielle de la fonction de distribution des vitesse vient de l'hypothèse d'indépendance des distributions selon x,y,z et de l'isotropie de l'espace.
+> La forme exponentielle de la fonction de distribution des vitesse vient de l'hypothèse d'indépendance des distributions selon $x,y,z$ et de l'isotropie de l'espace.
 > 
-> En effet, la seule solution mathématique satisfaisant l'équation fonctionnelle $f(v_x​)\cdot f(v_y​)f(v_z​)=g(v^2)$ est de la forme $e^{-\alpha v^2}$.
+> En effet, la seule solution mathématique satisfaisant l'équation fonctionnelle $f(v_x​)f(v_y​)f(v_z​)=g(v^2)$ est de la forme $e^{-\alpha v^2}$.
 > 
 > En ce qui concerne la constante de normalisation $A$, celle-ci est introduite pour assurer la conservation de la probabilité totale. Elle est déterminée par la condition de fermeture :
 $\int_{\mathbb{R}^3} \varphi(\vec{v}) d^3v = 1$
@@ -160,9 +160,9 @@ $$ \langle x \rangle = \int x f(x) dx $$
 
 Donc la vitesse moyenne $\langle v \rangle$ est donnée par l'intégrale :
 
-$$ \langle v \rangle = \int_0^{+\infty} v \varphi(v) dv $$
+$$ \langle v \rangle = \int_0^{+\infty} v \phi(v) dv $$
 
-En remplaçant $\varphi(v)$ par son expression, et en effectuant le calcul, on trouve :
+En remplaçant $\phi(v)$ par son expression, et en effectuant le calcul, on trouve :
 
 $$ \boxed{\langle v \rangle = \sqrt{\frac{8 k_B T}{\pi m}}} $$
 
@@ -175,7 +175,7 @@ $$ \frac{\langle v \rangle}{v_{mp}} = \sqrt{\frac\pi4} \approx 0.886 $$
 
 La vitesse quadratique moyenne (vitesse RMS, root mean square) est définie comme la racine carrée de la moyenne des carrés des vitesses des particules :
 
-$$ v_{rms} = \sqrt{\langle v^2 \rangle} = \sqrt{\int_0^{+\infty} v^2 \varphi(v) dv} $$
+$$ v_{rms} = \sqrt{\langle v^2 \rangle} = \sqrt{\int_0^{+\infty} v^2 \phi(v) dv} $$
 
 > [!TIP]Intéressant
 > La vitesse quadratique moyenne $v_{rms}$ est une mesure statistique qui donne une idée de la vitesse "efficace" physiquement quantifiable des particules dans le gaz.
